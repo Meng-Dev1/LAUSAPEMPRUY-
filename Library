@@ -494,7 +494,6 @@ function Menghub:Window(GuiConfig)
     GuiConfig.Icon         = GuiConfig.Icon or "rbxassetid://80659354137631"
 
     CURRENT_VERSION        = GuiConfig.Version
-    -- LoadConfigFromFile()
 
     local GuiFunc = {}
 
@@ -567,7 +566,7 @@ function Menghub:Window(GuiConfig)
         Main.BackgroundTransparency = 1
         Main.ImageTransparency = GuiConfig.ThemeTransparency or 0.15
     else
-        Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0) -- Latar Warna Window
+        Main.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
         Main.BackgroundTransparency = 0.15
     end
 
@@ -621,7 +620,7 @@ function Menghub:Window(GuiConfig)
     ThemeImage.Size = UDim2.new(1, 0, 1, 0)
     ThemeImage.ZIndex = 0
     ThemeImage.Image = "rbxassetid://76239481062153"
-    ThemeImage.ImageTransparency = 0.55  -- lebih samar
+    ThemeImage.ImageTransparency = 0.55
     ThemeImage.ScaleType = Enum.ScaleType.Crop
 
     local Gradient = Instance.new("UIGradient")
@@ -634,15 +633,14 @@ function Menghub:Window(GuiConfig)
     })
     Gradient.Parent = ThemeImage
 
-    -- Overlay gelap di atas gambar biar text tetap readable
     local Overlay = Instance.new("Frame")
     Overlay.Name = "DarkOverlay"
     Overlay.Parent = ImageWrapper
     Overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    Overlay.BackgroundTransparency = 0.55  -- overlay hitam tipis
+    Overlay.BackgroundTransparency = 0.55
     Overlay.BorderSizePixel = 0
     Overlay.Size = UDim2.new(1, 0, 1, 0)
-    Overlay.ZIndex = 1  -- di atas gambar, di bawah konten
+    Overlay.ZIndex = 1
 
     TextLabel.Font = Enum.Font.GothamBold
     TextLabel.Text = GuiConfig.Title
@@ -755,28 +753,21 @@ function Menghub:Window(GuiConfig)
     UICorner6.CornerRadius = UDim.new(0, 2)
     UICorner6.Parent = Layers
 
-    NameTab.Font = Enum.Font.GothamBold
-    NameTab.Text = ""
-    NameTab.TextColor3 = Color3.fromRGB(255, 255, 255)
-    NameTab.TextSize = 24
-    NameTab.TextWrapped = true
-    NameTab.TextXAlignment = Enum.TextXAlignment.Left
-    NameTab.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    NameTab.BackgroundTransparency = 0.9990000128746033
-    NameTab.BorderColor3 = Color3.fromRGB(0, 0, 0)
-    NameTab.BorderSizePixel = 0
-    NameTab.Size = UDim2.new(1, 0, 0, 30)
+    -- NameTab disembunyikan (tidak dipakai lagi)
+    NameTab.Visible = false
+    NameTab.Size = UDim2.new(1, 0, 0, 0)
     NameTab.Name = "NameTab"
     NameTab.Parent = Layers
 
-    LayersReal.AnchorPoint = Vector2.new(0, 1)
+    -- LayersReal sekarang mengisi penuh karena NameTab disembunyikan
+    LayersReal.AnchorPoint = Vector2.new(0, 0)
     LayersReal.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     LayersReal.BackgroundTransparency = 0.9990000128746033
     LayersReal.BorderColor3 = Color3.fromRGB(0, 0, 0)
     LayersReal.BorderSizePixel = 0
     LayersReal.ClipsDescendants = true
-    LayersReal.Position = UDim2.new(0, 0, 1, 0)
-    LayersReal.Size = UDim2.new(1, 0, 1, -33)
+    LayersReal.Position = UDim2.new(0, 0, 0, 0)
+    LayersReal.Size = UDim2.new(1, 0, 1, 0)
     LayersReal.Name = "LayersReal"
     LayersReal.Parent = Layers
 
@@ -1162,7 +1153,7 @@ function Menghub:Window(GuiConfig)
     UIStroke14.Parent = DropdownSelect
 
     DropdownSelectReal.AnchorPoint = Vector2.new(0.5, 0.5)
-    DropdownSelectReal.BackgroundColor3 = Color3.fromRGB(30, 30, 30) -- Latar Warna Dropdown
+    DropdownSelectReal.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
     DropdownSelectReal.BackgroundTransparency = 0.7
     DropdownSelectReal.BorderColor3 = Color3.fromRGB(0, 0, 0)
     DropdownSelectReal.BorderSizePixel = 0
@@ -1183,6 +1174,7 @@ function Menghub:Window(GuiConfig)
     DropPageLayout.Archivable = false
     DropPageLayout.Name = "DropPageLayout"
     DropPageLayout.Parent = DropdownFolder
+
     --// Tabs
     local Tabs = {}
     local CountTab = 0
@@ -1270,10 +1262,9 @@ function Menghub:Window(GuiConfig)
         FeatureImg.Size = UDim2.new(0, 16, 0, 16)
         FeatureImg.Name = "FeatureImg"
         FeatureImg.Parent = Tab
-        FeatureImg.Visible = false -- Hide Icon Maybe
+        FeatureImg.Visible = false
         if CountTab == 0 then
             LayersPageLayout:JumpToIndex(0)
-            NameTab.Text = TabConfig.Name
             local ChooseFrame = Instance.new("Frame");
             ChooseFrame.BackgroundColor3 = GuiConfig.Color
             ChooseFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
@@ -1331,7 +1322,6 @@ function Menghub:Window(GuiConfig)
                 
                 LayersPageLayout:JumpToIndex(Tab.LayoutOrder)
                 task.wait(0.05)
-                NameTab.Text = TabConfig.Name
                 TweenService:Create(
                     FrameChoose,
                     TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
@@ -1345,149 +1335,83 @@ function Menghub:Window(GuiConfig)
                 ):Play()
             end
         end)
+
         --// Section
         local Sections = {}
         local CountSection = 0
-        function Sections:AddSection(Title, AlwaysOpen)
-            local Title = Title or "Title"
-            local Section = Instance.new("Frame");
-            local SectionDecideFrame = Instance.new("Frame");
-            local UICorner1 = Instance.new("UICorner");
-            local UIGradient = Instance.new("UIGradient");
 
-            Section.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            Section.BackgroundTransparency = 0.999 
+        function Sections:AddSection(Title, AlwaysOpen)
+            Title = Title or "Title"
+
+            local Section = Instance.new("Frame")
+            Section.BackgroundTransparency = 1
             Section.BorderSizePixel = 0
             Section.LayoutOrder = CountSection
-            Section.ClipsDescendants = true
+            Section.ClipsDescendants = false
             Section.Size = UDim2.new(1, 0, 0, 30)
             Section.Name = "Section"
             Section.Parent = ScrolLayers
 
-            local SectionReal = Instance.new("Frame");
-            local UICorner = Instance.new("UICorner");
-            local UIStroke = Instance.new("UIStroke");
-            local SectionButton = Instance.new("TextButton");
-            local FeatureFrame = Instance.new("Frame");
-            local FeatureImg = Instance.new("ImageLabel");
-            local SectionTitle = Instance.new("TextLabel");
-            -- local SectionOutline = Instance.new("UIStroke")
+            local SectionRow = Instance.new("Frame")
+            SectionRow.Name = "SectionRow"
+            SectionRow.BackgroundTransparency = 1
+            SectionRow.BorderSizePixel = 0
+            SectionRow.Size = UDim2.new(1, 0, 0, 30)
+            SectionRow.Position = UDim2.new(0, 0, 0, 0)
+            SectionRow.Parent = Section
 
-            -- SectionOutline.Name = "SectionOutline"
-            -- SectionOutline.Parent = SectionReal 
-            -- SectionOutline.Color = Color3.fromRGB(189, 162, 241) 
-            -- SectionOutline.Thickness = 1.5
-            -- SectionOutline.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-            -- SectionOutline.Transparency = 0.2 
-
-            SectionReal.AnchorPoint = Vector2.new(0.5, 0)
-            SectionReal.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            SectionReal.BackgroundTransparency = 0.9350000023841858
-            SectionReal.BorderSizePixel = 0
-            SectionReal.Position = UDim2.new(0.5, 0, 0, 0)
-            SectionReal.Size = UDim2.new(1, -2, 0, 30)
-            SectionReal.Name = "SectionReal"
-            SectionReal.Parent = Section
-
-            UICorner.CornerRadius = UDim.new(0, 4)
-            UICorner.Parent = SectionReal
-
-            SectionButton.Font = Enum.Font.SourceSans
-            SectionButton.Text = ""
-            SectionButton.TextColor3 = Color3.fromRGB(0, 0, 0)
-            SectionButton.TextSize = 14
-            SectionButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            SectionButton.BackgroundTransparency = 0.9990000128746033
-            SectionButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
-            SectionButton.BorderSizePixel = 0
-            SectionButton.Size = UDim2.new(1, 0, 1, 0)
-            SectionButton.Name = "SectionButton"
-            SectionButton.Parent = SectionReal
-
-            FeatureFrame.AnchorPoint = Vector2.new(1, 0.5)
-            FeatureFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-            FeatureFrame.BackgroundTransparency = 0.9990000128746033
-            FeatureFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-            FeatureFrame.BorderSizePixel = 0
-            FeatureFrame.Position = UDim2.new(1, -5, 0.5, 0)
-            FeatureFrame.Size = UDim2.new(0, 20, 0, 20)
-            FeatureFrame.Name = "FeatureFrame"
-            FeatureFrame.Parent = SectionReal
-
-            FeatureImg.Image = "rbxassetid://16851841101"
-            FeatureImg.AnchorPoint = Vector2.new(0.5, 0.5)
-            FeatureImg.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            FeatureImg.BackgroundTransparency = 0.9990000128746033
-            FeatureImg.BorderColor3 = Color3.fromRGB(0, 0, 0)
-            FeatureImg.BorderSizePixel = 0
-            FeatureImg.Position = UDim2.new(0.5, 0, 0.5, 0)
-            FeatureImg.Rotation = -90
-            FeatureImg.Size = UDim2.new(1, 6, 1, 6)
-            FeatureImg.Name = "FeatureImg"
-            FeatureImg.Parent = FeatureFrame
-
+            -- Title teks, kiri
+            local SectionTitle = Instance.new("TextLabel")
             SectionTitle.Font = Enum.Font.GothamBold
             SectionTitle.Text = Title
-            SectionTitle.TextColor3 = Color3.fromRGB(230.77499270439148, 230.77499270439148, 230.77499270439148)
-            SectionTitle.TextSize = 13
+            SectionTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+            SectionTitle.TextSize = 14
             SectionTitle.TextXAlignment = Enum.TextXAlignment.Left
-            SectionTitle.TextYAlignment = Enum.TextYAlignment.Top
-            SectionTitle.AnchorPoint = Vector2.new(0, 0.5)
-            SectionTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            SectionTitle.BackgroundTransparency = 0.9990000128746033
-            SectionTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
-            SectionTitle.BorderSizePixel = 0
-            SectionTitle.Position = UDim2.new(0, 10, 0.5, 0)
-            SectionTitle.Size = UDim2.new(1, -50, 0, 13)
+            SectionTitle.BackgroundTransparency = 1
+            SectionTitle.Position = UDim2.new(0, 5, 0, 0)
+            SectionTitle.Size = UDim2.new(1, -30, 1, 0)
             SectionTitle.Name = "SectionTitle"
-            SectionTitle.Parent = SectionReal
+            SectionTitle.Parent = SectionRow
 
-            SectionDecideFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            SectionDecideFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
-            SectionDecideFrame.AnchorPoint = Vector2.new(0.5, 0)
-            SectionDecideFrame.BorderSizePixel = 0
-            SectionDecideFrame.Position = UDim2.new(0.5, 0, 0, 33)
-            SectionDecideFrame.Size = UDim2.new(0, 0, 0, 2)
-            SectionDecideFrame.Name = "SectionDecideFrame"
-            SectionDecideFrame.Parent = Section
+            -- Arrow kanan (► / ˅)
+            local ArrowImg = Instance.new("ImageLabel")
+            ArrowImg.Image = "rbxassetid://16851841101"
+            ArrowImg.ImageColor3 = Color3.fromRGB(255, 255, 255)
+            ArrowImg.AnchorPoint = Vector2.new(1, 0.5)
+            ArrowImg.BackgroundTransparency = 1
+            ArrowImg.Position = UDim2.new(1, -4, 0.5, 0)
+            ArrowImg.Size = UDim2.new(0, 22, 0, 22)
+            ArrowImg.Rotation = -90  -- menunjuk kanan saat closed
+            ArrowImg.Name = "ArrowImg"
+            ArrowImg.Parent = SectionRow
 
-            UICorner1.Parent = SectionDecideFrame
+            -- Button klik transparan
+            local SectionButton = Instance.new("TextButton")
+            SectionButton.Text = ""
+            SectionButton.BackgroundTransparency = 1
+            SectionButton.Size = UDim2.new(1, 0, 1, 0)
+            SectionButton.Name = "SectionButton"
+            SectionButton.Parent = SectionRow
 
-            UIGradient.Color = ColorSequence.new {
-                ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 20)),
-                ColorSequenceKeypoint.new(0.5, GuiConfig.Color),
-                ColorSequenceKeypoint.new(1, Color3.fromRGB(20, 20, 20))
-            }
-            UIGradient.Parent = SectionDecideFrame
-
-            --// Section Add
-            local SectionAdd = Instance.new("Frame");
-            local UICorner8 = Instance.new("UICorner");
-            local UIListLayout2 = Instance.new("UIListLayout");
-
+            -- SectionAdd: isi items, mulai height 0
+            local SectionAdd = Instance.new("Frame")
             SectionAdd.AnchorPoint = Vector2.new(0.5, 0)
-            SectionAdd.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            SectionAdd.BackgroundTransparency = 0.9990000128746033
-            SectionAdd.BorderColor3 = Color3.fromRGB(0, 0, 0)
+            SectionAdd.BackgroundTransparency = 1
             SectionAdd.BorderSizePixel = 0
             SectionAdd.ClipsDescendants = true
-            SectionAdd.LayoutOrder = 1
-            SectionAdd.Position = UDim2.new(0.5, 0, 0, 38)
-            SectionAdd.Size = UDim2.new(1, 0, 0, 100)
+            SectionAdd.Position = UDim2.new(0.5, 0, 0, 32)
+            SectionAdd.Size = UDim2.new(1, 0, 0, 0)
             SectionAdd.Name = "SectionAdd"
             SectionAdd.Parent = Section
 
-            UICorner8.CornerRadius = UDim.new(0, 2)
-            UICorner8.Parent = SectionAdd
-
+            local UIListLayout2 = Instance.new("UIListLayout")
             UIListLayout2.Padding = UDim.new(0, 3)
             UIListLayout2.SortOrder = Enum.SortOrder.LayoutOrder
             UIListLayout2.Parent = SectionAdd
 
             local OpenSection = false
             local isAnimating = false
-
-            local ANIM_TIME = 0.25
+            local ANIM_TIME = 0.2
             local ANIM_STYLE = Enum.EasingStyle.Quart
             local ANIM_DIR = Enum.EasingDirection.Out
 
@@ -1501,100 +1425,67 @@ function Menghub:Window(GuiConfig)
                 ScrolLayers.CanvasSize = UDim2.new(0, 0, 0, OffsetY)
             end
 
+            local function GetContentHeight()
+                local h = 0
+                for _, v in SectionAdd:GetChildren() do
+                    if v.Name ~= "UIListLayout" then
+                        h = h + v.Size.Y.Offset + 3
+                    end
+                end
+                return h
+            end
+
             local function UpdateSizeSection()
                 if OpenSection then
-                    local SectionSizeYWitdh = 38
-                    for _, v in SectionAdd:GetChildren() do
-                        if v.Name ~= "UIListLayout" and v.Name ~= "UICorner" then
-                            SectionSizeYWitdh = SectionSizeYWitdh + v.Size.Y.Offset + 3
-                        end
-                    end
-                    
-                    local tweenInfo = TweenInfo.new(ANIM_TIME, ANIM_STYLE, ANIM_DIR)
-                    local tweens = {
-                        TweenService:Create(FeatureImg, tweenInfo, { Rotation = 0 }),
-                        TweenService:Create(Section, tweenInfo, { Size = UDim2.new(1, 1, 0, SectionSizeYWitdh) }),
-                        TweenService:Create(SectionAdd, tweenInfo, { Size = UDim2.new(1, 0, 0, SectionSizeYWitdh - 38) }),
-                        TweenService:Create(SectionDecideFrame, tweenInfo, { Size = UDim2.new(1, 0, 0, 2) })
-                    }
-                    
-                    for _, tween in tweens do
-                        tween:Play()
-                    end
-                    
+                    local contentH = GetContentHeight()
+                    local totalH = 30 + 2 + contentH
+                    TweenService:Create(Section, TweenInfo.new(ANIM_TIME, ANIM_STYLE, ANIM_DIR),
+                        { Size = UDim2.new(1, 0, 0, totalH) }):Play()
+                    TweenService:Create(SectionAdd, TweenInfo.new(ANIM_TIME, ANIM_STYLE, ANIM_DIR),
+                        { Size = UDim2.new(1, 0, 0, contentH) }):Play()
                     task.delay(ANIM_TIME, UpdateSizeScroll)
                 end
             end
 
+            local function DoOpen()
+                OpenSection = true
+                TweenService:Create(SectionTitle, TweenInfo.new(0.15), { TextColor3 = GuiConfig.Color }):Play()
+                TweenService:Create(ArrowImg, TweenInfo.new(0.18), { Rotation = 0 }):Play()
+                UpdateSizeSection()
+            end
+
+            local function DoClose()
+                OpenSection = false
+                TweenService:Create(SectionTitle, TweenInfo.new(0.15), { TextColor3 = Color3.fromRGB(255, 255, 255) }):Play()
+                TweenService:Create(ArrowImg, TweenInfo.new(0.18), { Rotation = -90 }):Play()
+                TweenService:Create(Section, TweenInfo.new(ANIM_TIME, ANIM_STYLE, ANIM_DIR),
+                    { Size = UDim2.new(1, 0, 0, 30) }):Play()
+                TweenService:Create(SectionAdd, TweenInfo.new(ANIM_TIME, ANIM_STYLE, ANIM_DIR),
+                    { Size = UDim2.new(1, 0, 0, 0) }):Play()
+                task.delay(ANIM_TIME, UpdateSizeScroll)
+            end
+
             if AlwaysOpen == true then
                 SectionButton:Destroy()
-                FeatureFrame:Destroy()
-                OpenSection = true
-                UpdateSizeSection()
+                ArrowImg:Destroy()
+                DoOpen()
             elseif AlwaysOpen == false then
-                OpenSection = true
-                UpdateSizeSection()
-            else
-                OpenSection = false
+                DoOpen()
             end
 
             if AlwaysOpen ~= true then
                 SectionButton.Activated:Connect(function()
                     if isAnimating then return end
                     isAnimating = true
-                    
-                    CircleClick(SectionButton, Mouse.X, Mouse.Y)
-                    
-                    local tweenInfo = TweenInfo.new(ANIM_TIME, ANIM_STYLE, ANIM_DIR)
-                    
-                    OpenSection = not OpenSection
-                    
                     if OpenSection then
-                        TweenService:Create(SectionTitle, TweenInfo.new(0.2), { 
-                            TextColor3 = GuiConfig.Color 
-                        }):Play()
-                        
-                        UpdateSizeSection() 
-                        
-                        task.delay(ANIM_TIME, function()
-                            isAnimating = false
-                        end)
+                        DoClose()
                     else
-                        TweenService:Create(SectionTitle, TweenInfo.new(0.2), { 
-                            TextColor3 = Color3.fromRGB(230, 230, 230) 
-                        }):Play()
-                        
-                        local tweens = {
-                            TweenService:Create(FeatureImg, tweenInfo, { Rotation = -90 }),
-                            TweenService:Create(Section, tweenInfo, { Size = UDim2.new(1, 1, 0, 30) }),
-                            TweenService:Create(SectionDecideFrame, tweenInfo, { Size = UDim2.new(0, 0, 0, 2) })
-                        }
-                        
-                        for _, tween in tweens do
-                            tween:Play()
-                        end
-                        
-                        task.delay(ANIM_TIME, function()
-                            UpdateSizeScroll()
-                            isAnimating = false
-                        end)
+                        DoOpen()
                     end
+                    task.delay(ANIM_TIME + 0.05, function()
+                        isAnimating = false
+                    end)
                 end)
-            end
-
-            if AlwaysOpen == true or AlwaysOpen == false then
-                OpenSection = true
-                local SectionSizeYWitdh = 38
-                for _, v in SectionAdd:GetChildren() do
-                    if v.Name ~= "UIListLayout" and v.Name ~= "UICorner" then
-                        SectionSizeYWitdh = SectionSizeYWitdh + v.Size.Y.Offset + 3
-                    end
-                end
-                FeatureImg.Rotation = 0
-                Section.Size = UDim2.new(1, 1, 0, SectionSizeYWitdh)
-                SectionAdd.Size = UDim2.new(1, 0, 0, SectionSizeYWitdh - 38)
-                SectionDecideFrame.Size = UDim2.new(1, 0, 0, 2)
-                UpdateSizeScroll()
             end
 
             SectionAdd.ChildAdded:Connect(function()
@@ -1715,7 +1606,6 @@ function Menghub:Window(GuiConfig)
                 end
 
                 UpdateSize()
-
                 ParagraphContent:GetPropertyChangedSignal("TextBounds"):Connect(UpdateSize)
 
                 function ParagraphFunc:SetContent(content)
@@ -1737,8 +1627,7 @@ function Menghub:Window(GuiConfig)
                 PanelConfig.ButtonText = PanelConfig.Button or PanelConfig.ButtonText or "Confirm"
                 PanelConfig.ButtonCallback = PanelConfig.Callback or PanelConfig.ButtonCallback or function() end
                 PanelConfig.SubButtonText = PanelConfig.SubButton or PanelConfig.SubButtonText or nil
-                PanelConfig.SubButtonCallback = PanelConfig.SubCallback or PanelConfig.SubButtonCallback or
-                    function() end
+                PanelConfig.SubButtonCallback = PanelConfig.SubCallback or PanelConfig.SubButtonCallback or function() end
 
                 local configKey = "Panel_" .. PanelConfig.Title
                 if ConfigData[configKey] ~= nil then
@@ -1748,16 +1637,8 @@ function Menghub:Window(GuiConfig)
                 local PanelFunc = { Value = PanelConfig.Default }
 
                 local baseHeight = 50
-
-                if PanelConfig.Placeholder then
-                    baseHeight = baseHeight + 40
-                end
-
-                if PanelConfig.SubButtonText then
-                    baseHeight = baseHeight + 40
-                else
-                    baseHeight = baseHeight + 36
-                end
+                if PanelConfig.Placeholder then baseHeight = baseHeight + 40 end
+                if PanelConfig.SubButtonText then baseHeight = baseHeight + 40 else baseHeight = baseHeight + 36 end
 
                 local Panel = Instance.new("Frame")
                 Panel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -1803,10 +1684,7 @@ function Menghub:Window(GuiConfig)
                     InputFrame.Position = UDim2.new(0.5, 0, 0, 48)
                     InputFrame.Size = UDim2.new(1, -20, 0, 30)
                     InputFrame.Parent = Panel
-
-                    local inputCorner = Instance.new("UICorner")
-                    inputCorner.CornerRadius = UDim.new(0, 4)
-                    inputCorner.Parent = InputFrame
+                    Instance.new("UICorner", InputFrame).CornerRadius = UDim.new(0, 4)
 
                     InputBox = Instance.new("TextBox")
                     InputBox.Font = Enum.Font.GothamBold
@@ -1822,12 +1700,7 @@ function Menghub:Window(GuiConfig)
                     InputBox.Parent = InputFrame
                 end
 
-                local yBtn = 0
-                if PanelConfig.Placeholder then
-                    yBtn = 88
-                else
-                    yBtn = 48
-                end
+                local yBtn = PanelConfig.Placeholder and 88 or 48
 
                 local ButtonMain = Instance.new("TextButton")
                 ButtonMain.Font = Enum.Font.GothamBold
@@ -1840,10 +1713,7 @@ function Menghub:Window(GuiConfig)
                 ButtonMain.Size = PanelConfig.SubButtonText and UDim2.new(0.5, -12, 0, 30) or UDim2.new(1, -20, 0, 30)
                 ButtonMain.Position = UDim2.new(0, 10, 0, yBtn)
                 ButtonMain.Parent = Panel
-
-                local btnCorner = Instance.new("UICorner")
-                btnCorner.CornerRadius = UDim.new(0, 6)
-                btnCorner.Parent = ButtonMain
+                Instance.new("UICorner", ButtonMain).CornerRadius = UDim.new(0, 6)
 
                 ButtonMain.MouseButton1Click:Connect(function()
                     PanelConfig.ButtonCallback(InputBox and InputBox.Text or "")
@@ -1861,11 +1731,7 @@ function Menghub:Window(GuiConfig)
                     SubButton.Size = UDim2.new(0.5, -12, 0, 30)
                     SubButton.Position = UDim2.new(0.5, 2, 0, yBtn)
                     SubButton.Parent = Panel
-
-                    local subCorner = Instance.new("UICorner")
-                    subCorner.CornerRadius = UDim.new(0, 6)
-                    subCorner.Parent = SubButton
-
+                    Instance.new("UICorner", SubButton).CornerRadius = UDim.new(0, 6)
                     SubButton.MouseButton1Click:Connect(function()
                         PanelConfig.SubButtonCallback(InputBox and InputBox.Text or "")
                     end)
@@ -1875,7 +1741,6 @@ function Menghub:Window(GuiConfig)
                     InputBox.FocusLost:Connect(function()
                         PanelFunc.Value = InputBox.Text
                         ConfigData[configKey] = InputBox.Text
-                        -- SaveConfig()
                     end)
                 end
 
@@ -1966,7 +1831,6 @@ function Menghub:Window(GuiConfig)
                 end
 
                 local ToggleFunc = { Value = ToggleConfig.Default }
-                
                 local isInCallback = false
 
                 local Toggle = Instance.new("Frame")
@@ -2113,17 +1977,13 @@ function Menghub:Window(GuiConfig)
 
                     if not isInCallback then
                         isInCallback = true
-                        
                         task.spawn(function()
                             if typeof(ToggleConfig.Callback) == "function" then
                                 local ok, err = pcall(function()
                                     ToggleConfig.Callback(Value)
                                 end)
-                                if not ok then 
-                                    warn("Toggle Callback error:", err) 
-                                end
+                                if not ok then warn("Toggle Callback error:", err) end
                             end
-                            
                             task.wait(0.05)
                             isInCallback = false
                         end)
@@ -2154,29 +2014,26 @@ function Menghub:Window(GuiConfig)
 
                 local SliderFunc = { Value = SliderConfig.Default }
 
-                local Slider          = Instance.new("Frame")
-                local UICorner15      = Instance.new("UICorner")
-                local SliderTitle     = Instance.new("TextLabel")
-                local SliderContent   = Instance.new("TextLabel")
-                local SliderInput     = Instance.new("Frame")
-                local UICorner16      = Instance.new("UICorner")
-                local InputStroke     = Instance.new("UIStroke")
-                local TextBox         = Instance.new("TextBox")
-                local SliderFrame     = Instance.new("Frame")
-                local UICorner17      = Instance.new("UICorner")
-                local SliderDraggable = Instance.new("Frame")
-                local UICorner18      = Instance.new("UICorner")
-                local SliderCircle    = Instance.new("Frame")
-                local UICorner19      = Instance.new("UICorner")
-                local CircleRing      = Instance.new("UIStroke")
-                local CircleDot       = Instance.new("Frame")
-                local UICornerDot     = Instance.new("UICorner")
+                local Slider = Instance.new("Frame");
+                local UICorner15 = Instance.new("UICorner");
+                local SliderTitle = Instance.new("TextLabel");
+                local SliderContent = Instance.new("TextLabel");
+                local SliderInput = Instance.new("Frame");
+                local UICorner16 = Instance.new("UICorner");
+                local TextBox = Instance.new("TextBox");
+                local SliderFrame = Instance.new("Frame");
+                local UICorner17 = Instance.new("UICorner");
+                local SliderDraggable = Instance.new("Frame");
+                local UICorner18 = Instance.new("UICorner");
+                local UIStroke5 = Instance.new("UIStroke");
+                local SliderCircle = Instance.new("Frame");
+                local UICorner19 = Instance.new("UICorner");
+                local UIStroke6 = Instance.new("UIStroke");
+                local UIStroke7 = Instance.new("UIStroke");
 
-                -- =====================
-                --   CONTAINER
-                -- =====================
                 Slider.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                Slider.BackgroundTransparency = 0.935
+                Slider.BackgroundTransparency = 0.9350000023841858
+                Slider.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 Slider.BorderSizePixel = 0
                 Slider.LayoutOrder = CountItem
                 Slider.Size = UDim2.new(1, 0, 0, 46)
@@ -2186,33 +2043,31 @@ function Menghub:Window(GuiConfig)
                 UICorner15.CornerRadius = UDim.new(0, 4)
                 UICorner15.Parent = Slider
 
-                -- =====================
-                --   TITLE
-                -- =====================
                 SliderTitle.Font = Enum.Font.GothamBold
                 SliderTitle.Text = SliderConfig.Title
-                SliderTitle.TextColor3 = Color3.fromRGB(230, 230, 230)
+                SliderTitle.TextColor3 = Color3.fromRGB(230.77499270439148, 230.77499270439148, 230.77499270439148)
                 SliderTitle.TextSize = 13
                 SliderTitle.TextXAlignment = Enum.TextXAlignment.Left
                 SliderTitle.TextYAlignment = Enum.TextYAlignment.Top
-                SliderTitle.BackgroundTransparency = 1
+                SliderTitle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                SliderTitle.BackgroundTransparency = 0.9990000128746033
+                SliderTitle.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 SliderTitle.BorderSizePixel = 0
                 SliderTitle.Position = UDim2.new(0, 10, 0, 10)
                 SliderTitle.Size = UDim2.new(1, -180, 0, 13)
                 SliderTitle.Name = "SliderTitle"
                 SliderTitle.Parent = Slider
 
-                -- =====================
-                --   CONTENT
-                -- =====================
                 SliderContent.Font = Enum.Font.GothamBold
                 SliderContent.Text = SliderConfig.Content
                 SliderContent.TextColor3 = Color3.fromRGB(255, 255, 255)
                 SliderContent.TextSize = 12
-                SliderContent.TextTransparency = 0.6
+                SliderContent.TextTransparency = 0.6000000238418579
                 SliderContent.TextXAlignment = Enum.TextXAlignment.Left
                 SliderContent.TextYAlignment = Enum.TextYAlignment.Bottom
-                SliderContent.BackgroundTransparency = 1
+                SliderContent.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                SliderContent.BackgroundTransparency = 0.9990000128746033
+                SliderContent.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 SliderContent.BorderSizePixel = 0
                 SliderContent.Position = UDim2.new(0, 10, 0, 25)
                 SliderContent.Size = UDim2.new(1, -180, 0, 12)
@@ -2234,140 +2089,105 @@ function Menghub:Window(GuiConfig)
                 end)
 
                 SliderInput.AnchorPoint = Vector2.new(0, 0.5)
-                SliderInput.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-                SliderInput.BackgroundTransparency = 0.55
+                SliderInput.BackgroundColor3 = GuiConfig.Color
+                SliderInput.BorderColor3 = Color3.fromRGB(0, 0, 0)
+                SliderInput.BackgroundTransparency = 1
                 SliderInput.BorderSizePixel = 0
-                SliderInput.Position = UDim2.new(1, -176, 0.5, 0)
-                SliderInput.Size = UDim2.new(0, 36, 0, 22)
+                SliderInput.Position = UDim2.new(1, -155, 0.5, 0)
+                SliderInput.Size = UDim2.new(0, 28, 0, 20)
                 SliderInput.Name = "SliderInput"
                 SliderInput.Parent = Slider
 
-                UICorner16.CornerRadius = UDim.new(0, 3)
+                UICorner16.CornerRadius = UDim.new(0, 2)
                 UICorner16.Parent = SliderInput
 
-                InputStroke.Color = GuiConfig.Color
-                InputStroke.Thickness = 1
-                InputStroke.Transparency = 0.4
-                InputStroke.Parent = SliderInput
-
                 TextBox.Font = Enum.Font.GothamBold
-                TextBox.Text = tostring(SliderConfig.Default)
+                TextBox.Text = "90"
                 TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
                 TextBox.TextSize = 12
                 TextBox.TextWrapped = true
                 TextBox.ClearTextOnFocus = false
-                TextBox.BackgroundTransparency = 1
+                TextBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+                TextBox.BackgroundTransparency = 0.9990000128746033
+                TextBox.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 TextBox.BorderSizePixel = 0
-                TextBox.Position = UDim2.new(0, 0, 0, 0)
+                TextBox.Position = UDim2.new(0, -1, 0, 0)
                 TextBox.Size = UDim2.new(1, 0, 1, 0)
                 TextBox.Parent = SliderInput
 
-                TextBox.Focused:Connect(function()
-                    TweenService:Create(InputStroke,
-                        TweenInfo.new(0.15, Enum.EasingStyle.Quad),
-                        { Transparency = 0 }
-                    ):Play()
-                end)
-                TextBox.FocusLost:Connect(function()
-                    TweenService:Create(InputStroke,
-                        TweenInfo.new(0.15, Enum.EasingStyle.Quad),
-                        { Transparency = 0.4 }
-                    ):Play()
-                end)
-
                 SliderFrame.AnchorPoint = Vector2.new(1, 0.5)
                 SliderFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                SliderFrame.BackgroundTransparency = 0.82
+                SliderFrame.BackgroundTransparency = 0.800000011920929
+                SliderFrame.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 SliderFrame.BorderSizePixel = 0
-                SliderFrame.Position = UDim2.new(1, -18, 0.5, 0)
-                SliderFrame.Size = UDim2.new(0, 110, 0, 6)
+                SliderFrame.Position = UDim2.new(1, -20, 0.5, 0)
+                SliderFrame.Size = UDim2.new(0, 100, 0, 3)
                 SliderFrame.Name = "SliderFrame"
                 SliderFrame.Parent = Slider
 
-                UICorner17.CornerRadius = UDim.new(1, 0)
                 UICorner17.Parent = SliderFrame
 
                 SliderDraggable.AnchorPoint = Vector2.new(0, 0.5)
                 SliderDraggable.BackgroundColor3 = GuiConfig.Color
-                SliderDraggable.BackgroundTransparency = 0
+                SliderDraggable.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 SliderDraggable.BorderSizePixel = 0
                 SliderDraggable.Position = UDim2.new(0, 0, 0.5, 0)
-                SliderDraggable.Size = UDim2.new(0.9, 0, 1, 0)
+                SliderDraggable.Size = UDim2.new(0.899999976, 0, 0, 1)
                 SliderDraggable.Name = "SliderDraggable"
                 SliderDraggable.Parent = SliderFrame
 
-                UICorner18.CornerRadius = UDim.new(1, 0)
                 UICorner18.Parent = SliderDraggable
 
                 SliderCircle.AnchorPoint = Vector2.new(1, 0.5)
-                SliderCircle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                SliderCircle.BackgroundColor3 = GuiConfig.Color
+                SliderCircle.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 SliderCircle.BorderSizePixel = 0
-                SliderCircle.Position = UDim2.new(1, 5, 0.5, 0)
-                SliderCircle.Size = UDim2.new(0, 14, 0, 14)
+                SliderCircle.Position = UDim2.new(1, 4, 0.5, 0)
+                SliderCircle.Size = UDim2.new(0, 8, 0, 8)
                 SliderCircle.Name = "SliderCircle"
                 SliderCircle.Parent = SliderDraggable
 
-                UICorner19.CornerRadius = UDim.new(1, 0)
                 UICorner19.Parent = SliderCircle
 
-                CircleRing.Color = GuiConfig.Color
-                CircleRing.Thickness = 2.5
-                CircleRing.Transparency = 0
-                CircleRing.Parent = SliderCircle
-
-                CircleDot.AnchorPoint = Vector2.new(0.5, 0.5)
-                CircleDot.BackgroundColor3 = GuiConfig.Color
-                CircleDot.BorderSizePixel = 0
-                CircleDot.Position = UDim2.new(0.5, 0, 0.5, 0)
-                CircleDot.Size = UDim2.new(0, 5, 0, 5)
-                CircleDot.Name = "CircleDot"
-                CircleDot.Parent = SliderCircle
-
-                UICornerDot.CornerRadius = UDim.new(1, 0)
-                UICornerDot.Parent = CircleDot
-
-                SliderFrame.MouseEnter:Connect(function()
-                    TweenService:Create(SliderFrame,
-                        TweenInfo.new(0.15, Enum.EasingStyle.Quad),
-                        { Size = UDim2.new(0, 110, 0, 8) }
-                    ):Play()
-                end)
-                SliderFrame.MouseLeave:Connect(function()
-                    TweenService:Create(SliderFrame,
-                        TweenInfo.new(0.15, Enum.EasingStyle.Quad),
-                        { Size = UDim2.new(0, 110, 0, 6) }
-                    ):Play()
-                end)
+                UIStroke6.Color = GuiConfig.Color
+                UIStroke6.Parent = SliderCircle
 
                 local Dragging = false
-
                 local function Round(Number, Factor)
                     local Result = math.floor(Number / Factor + (math.sign(Number) * 0.5)) * Factor
-                    if Result < 0 then Result = Result + Factor end
+                    if Result < 0 then
+                        Result = Result + Factor
+                    end
                     return Result
                 end
-
                 function SliderFunc:Set(Value)
                     Value = math.clamp(Round(Value, SliderConfig.Increment), SliderConfig.Min, SliderConfig.Max)
                     SliderFunc.Value = Value
                     TextBox.Text = tostring(Value)
-                    TweenService:Create(SliderDraggable,
-                        TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                    TweenService:Create(
+                        SliderDraggable,
+                        TweenInfo.new(0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
                         { Size = UDim2.fromScale((Value - SliderConfig.Min) / (SliderConfig.Max - SliderConfig.Min), 1) }
                     ):Play()
+
                     SliderConfig.Callback(Value)
                     ConfigData[configKey] = Value
+                    -- SaveConfig()
                 end
 
                 SliderFrame.InputBegan:Connect(function(Input)
                     if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                         Dragging = true
-                        TweenService:Create(SliderCircle,
-                            TweenInfo.new(0.18, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
-                            { Size = UDim2.new(0, 20, 0, 20) }
+                        TweenService:Create(
+                            SliderCircle,
+                            TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                            { Size = UDim2.new(0, 14, 0, 14) }
                         ):Play()
                         local SizeScale = math.clamp(
-                            (Input.Position.X - SliderFrame.AbsolutePosition.X) / SliderFrame.AbsoluteSize.X, 0, 1)
+                            (Input.Position.X - SliderFrame.AbsolutePosition.X) / SliderFrame.AbsoluteSize.X,
+                            0,
+                            1
+                        )
                         SliderFunc:Set(SliderConfig.Min + ((SliderConfig.Max - SliderConfig.Min) * SizeScale))
                     end
                 end)
@@ -2376,9 +2196,10 @@ function Menghub:Window(GuiConfig)
                     if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                         Dragging = false
                         SliderConfig.Callback(SliderFunc.Value)
-                        TweenService:Create(SliderCircle,
+                        TweenService:Create(
+                            SliderCircle,
                             TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-                            { Size = UDim2.new(0, 14, 0, 14) }
+                            { Size = UDim2.new(0, 8, 0, 8) }
                         ):Play()
                     end
                 end)
@@ -2386,26 +2207,27 @@ function Menghub:Window(GuiConfig)
                 UserInputService.InputChanged:Connect(function(Input)
                     if Dragging and (Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch) then
                         local SizeScale = math.clamp(
-                            (Input.Position.X - SliderFrame.AbsolutePosition.X) / SliderFrame.AbsoluteSize.X, 0, 1)
+                            (Input.Position.X - SliderFrame.AbsolutePosition.X) / SliderFrame.AbsoluteSize.X,
+                            0,
+                            1
+                        )
                         SliderFunc:Set(SliderConfig.Min + ((SliderConfig.Max - SliderConfig.Min) * SizeScale))
                     end
                 end)
 
-                TextBox.FocusLost:Connect(function()
-                    local Valid = TextBox.Text:gsub("[^%d%-]", "")
+                TextBox:GetPropertyChangedSignal("Text"):Connect(function()
+                    local Valid = TextBox.Text:gsub("[^%d]", "")
                     if Valid ~= "" then
-                        local ValidNumber = math.clamp(tonumber(Valid) or SliderConfig.Min, SliderConfig.Min, SliderConfig.Max)
+                        local ValidNumber = math.clamp(tonumber(Valid), SliderConfig.Min, SliderConfig.Max)
                         SliderFunc:Set(ValidNumber)
                     else
-                        TextBox.Text = tostring(SliderFunc.Value)
+                        SliderFunc:Set(SliderConfig.Min)
                     end
                 end)
-
                 SliderFunc:Set(SliderConfig.Default)
                 CountItem = CountItem + 1
                 SliderFunc.Type = "Slider"
                 Elements[configKey] = SliderFunc
-                SliderFunc.Instance = Slider
                 return SliderFunc
             end
 
@@ -2584,8 +2406,7 @@ function Menghub:Window(GuiConfig)
                         MoreBlur.Visible = true
                         DropPageLayout:JumpToIndex(SelectOptionsFrame.LayoutOrder)
                         TweenService:Create(MoreBlur, TweenInfo.new(0.3), { BackgroundTransparency = 1 }):Play()
-                        TweenService:Create(DropdownSelect, TweenInfo.new(0.3), { Position = UDim2.new(1, -11, 0.5, 0) })
-                            :Play()
+                        TweenService:Create(DropdownSelect, TweenInfo.new(0.3), { Position = UDim2.new(1, -11, 0.5, 0) }):Play()
                     end
                 end)
 
@@ -2761,27 +2582,21 @@ function Menghub:Window(GuiConfig)
                     end
 
                     ConfigData[configKey] = DropdownFunc.Value
-                    -- SaveConfig()
 
                     local texts = {}
                     for _, Drop in ScrollSelect:GetChildren() do
                         if Drop.Name == "Option" and Drop:FindFirstChild("OptionText") then
                             local v = Drop:GetAttribute("RealValue")
-                            local selected = DropdownConfig.Multi and table.find(DropdownFunc.Value, v) or
-                                DropdownFunc.Value == v
+                            local selected = DropdownConfig.Multi and table.find(DropdownFunc.Value, v) or DropdownFunc.Value == v
 
                             if selected then
-                                TweenService:Create(Drop.ChooseFrame, TweenInfo.new(0.2),
-                                    { Size = UDim2.new(0, 1, 0, 12) }):Play()
-                                TweenService:Create(Drop.ChooseFrame.UIStroke, TweenInfo.new(0.2), { Transparency = 0 })
-                                    :Play()
+                                TweenService:Create(Drop.ChooseFrame, TweenInfo.new(0.2), { Size = UDim2.new(0, 1, 0, 12) }):Play()
+                                TweenService:Create(Drop.ChooseFrame.UIStroke, TweenInfo.new(0.2), { Transparency = 0 }):Play()
                                 TweenService:Create(Drop, TweenInfo.new(0.2), { BackgroundTransparency = 0.935 }):Play()
                                 table.insert(texts, Drop.OptionText.Text)
                             else
-                                TweenService:Create(Drop.ChooseFrame, TweenInfo.new(0.1),
-                                    { Size = UDim2.new(0, 0, 0, 0) }):Play()
-                                TweenService:Create(Drop.ChooseFrame.UIStroke, TweenInfo.new(0.1),
-                                    { Transparency = 0.999 }):Play()
+                                TweenService:Create(Drop.ChooseFrame, TweenInfo.new(0.1), { Size = UDim2.new(0, 0, 0, 0) }):Play()
+                                TweenService:Create(Drop.ChooseFrame.UIStroke, TweenInfo.new(0.1), { Transparency = 0.999 }):Play()
                                 TweenService:Create(Drop, TweenInfo.new(0.1), { BackgroundTransparency = 0.999 }):Play()
                             end
                         end
@@ -2867,15 +2682,6 @@ function Menghub:Window(GuiConfig)
                 SubSection.Size = UDim2.new(1, 0, 0, 22)
                 SubSection.LayoutOrder = CountItem
 
-                -- HAPUS Background box
-                -- local Background = Instance.new("Frame")
-                -- Background.Parent = SubSection
-                -- Background.Size = UDim2.new(1, 0, 1, 0)
-                -- Background.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                -- Background.BackgroundTransparency = 0.935
-                -- Background.BorderSizePixel = 0
-                -- Instance.new("UICorner", Background).CornerRadius = UDim.new(0, 6)
-
                 local Label = Instance.new("TextLabel")
                 Label.Parent = SubSection
                 Label.AnchorPoint = Vector2.new(0, 0.5)
@@ -2883,8 +2689,8 @@ function Menghub:Window(GuiConfig)
                 Label.Size = UDim2.new(1, -20, 1, 0)
                 Label.BackgroundTransparency = 1
                 Label.Font = Enum.Font.GothamBold
-                Label.Text = title -- Hapus "? ?" biar clean
-                Label.TextColor3 = GuiConfig.Color -- Pake warna dari config
+                Label.Text = title
+                Label.TextColor3 = GuiConfig.Color
                 Label.TextSize = 14
                 Label.TextXAlignment = Enum.TextXAlignment.Left
 
