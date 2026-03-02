@@ -816,7 +816,7 @@ function Menghub:Window(GuiConfig)
     PlayerName.Name = "PlayerName"
     PlayerName.Font = Enum.Font.GothamBold
 
-    local displayName = game.Players.LocalPlayer.DisplayName
+    local displayName = game.Players.LocalPlayer.Name
     local shortName = displayName
     if #displayName > 3 then
         shortName = string.sub(displayName, 1, 3) .. "***"
