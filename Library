@@ -835,6 +835,141 @@ function Menghub:Window(GuiConfig)
     local ScrollTab = Instance.new("ScrollingFrame");
     local UIListLayout = Instance.new("UIListLayout");
 
+    -- Search Bar di atas ScrollTab
+    local SearchBarFrame = Instance.new("Frame")
+    SearchBarFrame.Name = "SearchBarFrame"
+    SearchBarFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    SearchBarFrame.BackgroundTransparency = 0.93
+    SearchBarFrame.BorderSizePixel = 0
+    SearchBarFrame.Position = UDim2.new(0, 3, 0, 0)
+    SearchBarFrame.Size = UDim2.new(1, -6, 0, 24)
+    SearchBarFrame.Parent = LayersTab
+    Instance.new("UICorner", SearchBarFrame).CornerRadius = UDim.new(0, 4)
+
+    local SearchInput = Instance.new("TextBox")
+    SearchInput.PlaceholderText = "\xF0\x9F\x94\x8D Search..."
+    SearchInput.PlaceholderColor3 = Color3.fromRGB(100, 100, 100)
+    SearchInput.Text = ""
+    SearchInput.Font = Enum.Font.GothamBold
+    SearchInput.TextSize = 11
+    SearchInput.TextColor3 = Color3.fromRGB(220, 220, 220)
+    SearchInput.BackgroundTransparency = 1
+    SearchInput.TextXAlignment = Enum.TextXAlignment.Left
+    SearchInput.ClearTextOnFocus = false
+    SearchInput.Position = UDim2.new(0, 8, 0, 0)
+    SearchInput.Size = UDim2.new(1, -10, 1, 0)
+    SearchInput.Parent = SearchBarFrame
+
+    SearchInput:GetPropertyChangedSignal("Text"):Connect(function()
+        local query = string.lower(SearchInput.Text)
+        
+        -- Reset dulu semua highlight
+        for _, page in LayersFolder:GetChildren() do
+            if page:IsA("ScrollingFrame") then
+                for _, section in page:GetChildren() do
+                    if section.Name == "Section" then
+                        local sectionAdd = section:FindFirstChild("SectionAdd")
+                        if sectionAdd then
+                            for _, item in sectionAdd:GetChildren() do
+                                if item:IsA("Frame") then
+                                    item.Visible = true
+                                    if item:FindFirstChild("SearchHighlight") then
+                                        item:FindFirstChild("SearchHighlight"):Destroy()
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+
+        if query == "" then return end
+
+        for _, page in LayersFolder:GetChildren() do
+            if page:IsA("ScrollingFrame") then
+                for _, section in page:GetChildren() do
+                    if section.Name == "Section" then
+                        local sectionAdd = section:FindFirstChild("SectionAdd")
+                        local sectionRow = section:FindFirstChild("SectionRow")
+                        if sectionAdd then
+                            for _, item in sectionAdd:GetChildren() do
+                                if item:IsA("Frame") then
+                                    local titleLabel = item:FindFirstChild("ToggleTitle")
+                                        or item:FindFirstChild("SliderTitle")
+                                        or item:FindFirstChild("DropdownTitle")
+                                        or item:FindFirstChild("InputTitle")
+                                        or item:FindFirstChild("ParagraphTitle")
+
+                                    -- cek button (TextButton langsung di dalam ButtonFrame)
+                                    if not titleLabel then
+                                        for _, child in item:GetChildren() do
+                                            if child:IsA("TextButton") and child.Text ~= "" then
+                                                titleLabel = child
+                                                break
+                                            end
+                                        end
+                                    end
+                                    if titleLabel then
+                                        local match = string.find(string.lower(titleLabel.Text), query, 1, true) ~= nil
+                                        if match then
+                                            -- Jump ke tab dulu
+                                            LayersPageLayout:JumpToIndex(page.LayoutOrder)
+
+                                            -- Buka section paksa
+                                            local contentH = 0
+                                            for _, v in sectionAdd:GetChildren() do
+                                                if v.Name ~= "UIListLayout" then
+                                                    contentH = contentH + v.Size.Y.Offset + 3
+                                                end
+                                            end
+                                            local totalH = 30 + 2 + contentH
+                                            section.Size = UDim2.new(1, 0, 0, totalH)
+                                            sectionAdd.Size = UDim2.new(1, 0, 0, contentH)
+
+                                            -- Update warna title section jadi aktif
+                                            if sectionRow then
+                                                local sectionTitle = sectionRow:FindFirstChild("SectionTitle")
+                                                local arrowImg = sectionRow:FindFirstChild("ArrowImg")
+                                                if sectionTitle then
+                                                    sectionTitle.TextColor3 = GuiConfig.Color
+                                                end
+                                                if arrowImg then
+                                                    arrowImg.Rotation = 0
+                                                end
+                                            end
+
+                                            -- Kasih highlight ke item
+                                            local highlight = Instance.new("UIStroke")
+                                            highlight.Name = "SearchHighlight"
+                                            highlight.Color = GuiConfig.Color
+                                            highlight.Thickness = 1.5
+                                            highlight.Transparency = 0
+                                            highlight.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+                                            highlight.Parent = item
+
+                                            -- Scroll ke item
+                                            task.wait(0.1)
+                                            local scrollParent = page
+                                            local itemPos = item.AbsolutePosition.Y - scrollParent.AbsolutePosition.Y + scrollParent.CanvasPosition.Y
+                                            scrollParent.CanvasPosition = Vector2.new(0, itemPos - 10)
+
+                                            return
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end)
+
+    -- Geser ScrollTab ke bawah biar ga ketutup
+    ScrollTab.Position = UDim2.new(0, 0, 0, 28)
+    ScrollTab.Size = UDim2.new(1, 0, 1, -78)
+
     ScrollTab.CanvasSize = UDim2.new(0, 0, 1.10000002, 0)
     ScrollTab.ScrollBarImageColor3 = Color3.fromRGB(0, 0, 0)
     ScrollTab.ScrollBarThickness = 0
