@@ -1465,28 +1465,22 @@ function Menghub:Window(GuiConfig)
                 task.delay(ANIM_TIME, UpdateSizeScroll)
             end
 
-            if AlwaysOpen == true then
-                SectionButton:Destroy()
-                ArrowImg:Destroy()
-                DoOpen()
-            elseif AlwaysOpen == false then
+            if AlwaysOpen == true or AlwaysOpen == false then
                 DoOpen()
             end
 
-            if AlwaysOpen ~= true then
-                SectionButton.Activated:Connect(function()
-                    if isAnimating then return end
-                    isAnimating = true
-                    if OpenSection then
-                        DoClose()
-                    else
-                        DoOpen()
-                    end
-                    task.delay(ANIM_TIME + 0.05, function()
-                        isAnimating = false
-                    end)
+            SectionButton.Activated:Connect(function()
+                if isAnimating then return end
+                isAnimating = true
+                if OpenSection then
+                    DoClose()
+                else
+                    DoOpen()
+                end
+                task.delay(ANIM_TIME + 0.05, function()
+                    isAnimating = false
                 end)
-            end
+            end)
 
             SectionAdd.ChildAdded:Connect(function()
                 task.wait(0.05)
