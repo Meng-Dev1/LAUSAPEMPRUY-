@@ -1769,7 +1769,7 @@ function Menghub:Window(GuiConfig)
                     Btn.Font = Enum.Font.GothamMedium
                     Btn.Text = text
                     Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-                    Btn.TextSize = 13
+                    Btn.TextSize = 12
                     Btn.AutoButtonColor = false
 
                     local Corner = Instance.new("UICorner")
