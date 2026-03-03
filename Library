@@ -835,20 +835,39 @@ function Menghub:Window(GuiConfig)
     local ScrollTab = Instance.new("ScrollingFrame");
     local UIListLayout = Instance.new("UIListLayout");
 
-    -- Search Bar di atas ScrollTab
     local SearchBarFrame = Instance.new("Frame")
     SearchBarFrame.Name = "SearchBarFrame"
     SearchBarFrame.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     SearchBarFrame.BackgroundTransparency = 0.93
     SearchBarFrame.BorderSizePixel = 0
-    SearchBarFrame.Position = UDim2.new(0, 3, 0, 0)
-    SearchBarFrame.Size = UDim2.new(1, -6, 0, 24)
+    SearchBarFrame.Position = UDim2.new(0, 4, 0, 3)
+    SearchBarFrame.Size = UDim2.new(1, -8, 0, 26)
     SearchBarFrame.Parent = LayersTab
-    Instance.new("UICorner", SearchBarFrame).CornerRadius = UDim.new(0, 4)
+
+    local SearchCorner = Instance.new("UICorner")
+    SearchCorner.CornerRadius = UDim.new(0, 6)
+    SearchCorner.Parent = SearchBarFrame
+
+    local PillStroke = Instance.new("UIStroke")
+    PillStroke.Color = GuiConfig.Color
+    PillStroke.Thickness = 1
+    PillStroke.Transparency = 0.7
+    PillStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    PillStroke.Parent = SearchBarFrame
+
+    local SearchIcon = Instance.new("ImageLabel")
+    SearchIcon.Image = "rbxassetid://109869955247116"
+    SearchIcon.ImageColor3 = GuiConfig.Color
+    SearchIcon.ImageTransparency = 0.3
+    SearchIcon.BackgroundTransparency = 1
+    SearchIcon.AnchorPoint = Vector2.new(0, 0.5)
+    SearchIcon.Position = UDim2.new(0, 7, 0.5, 0)
+    SearchIcon.Size = UDim2.new(0, 13, 0, 13)
+    SearchIcon.Parent = SearchBarFrame
 
     local SearchInput = Instance.new("TextBox")
-    SearchInput.PlaceholderText = "\xF0\x9F\x94\x8D Search..."
-    SearchInput.PlaceholderColor3 = Color3.fromRGB(100, 100, 100)
+    SearchInput.PlaceholderText = "Search..."
+    SearchInput.PlaceholderColor3 = Color3.fromRGB(120, 120, 120)
     SearchInput.Text = ""
     SearchInput.Font = Enum.Font.GothamBold
     SearchInput.TextSize = 11
@@ -856,9 +875,19 @@ function Menghub:Window(GuiConfig)
     SearchInput.BackgroundTransparency = 1
     SearchInput.TextXAlignment = Enum.TextXAlignment.Left
     SearchInput.ClearTextOnFocus = false
-    SearchInput.Position = UDim2.new(0, 8, 0, 0)
-    SearchInput.Size = UDim2.new(1, -10, 1, 0)
+    SearchInput.Position = UDim2.new(0, 24, 0, 0)
+    SearchInput.Size = UDim2.new(1, -30, 1, 0)
     SearchInput.Parent = SearchBarFrame
+
+    SearchInput.Focused:Connect(function()
+        TweenService:Create(PillStroke, TweenInfo.new(0.2), { Transparency = 0 }):Play()
+        TweenService:Create(SearchBarFrame, TweenInfo.new(0.2), { BackgroundTransparency = 0.85 }):Play()
+    end)
+
+    SearchInput.FocusLost:Connect(function()
+        TweenService:Create(PillStroke, TweenInfo.new(0.2), { Transparency = 0.7 }):Play()
+        TweenService:Create(SearchBarFrame, TweenInfo.new(0.2), { BackgroundTransparency = 0.93 }):Play()
+    end)
 
     SearchInput:GetPropertyChangedSignal("Text"):Connect(function()
         local query = string.lower(SearchInput.Text)
@@ -967,8 +996,8 @@ function Menghub:Window(GuiConfig)
     end)
 
     -- Geser ScrollTab ke bawah biar ga ketutup
-    ScrollTab.Position = UDim2.new(0, 0, 0, 28)
-    ScrollTab.Size = UDim2.new(1, 0, 1, -78)
+    ScrollTab.Position = UDim2.new(0, 0, 0, 32)
+    ScrollTab.Size = UDim2.new(1, 0, 1, -82)
 
     ScrollTab.CanvasSize = UDim2.new(0, 0, 1.10000002, 0)
     ScrollTab.ScrollBarImageColor3 = Color3.fromRGB(0, 0, 0)
