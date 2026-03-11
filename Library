@@ -523,7 +523,7 @@ function Menghub:Window(GuiConfig)
     local ThemeImage = Instance.new("ImageLabel");
 
     Menghubb.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    Menghubb.Name = "Menghubb"
+    Menghubb.Name = _G.HubName
     Menghubb.ResetOnSpawn = false
     Menghubb.Parent = game:GetService("CoreGui"):WaitForChild("RobloxGui")
 
@@ -772,10 +772,20 @@ function Menghub:Window(GuiConfig)
     LayersFolder.Name = "LayersFolder"
     LayersFolder.Parent = LayersReal
 
+    local TabSwitchOverlay = Instance.new("Frame")
+    TabSwitchOverlay.Name = "TabSwitchOverlay"
+    TabSwitchOverlay.Size = UDim2.new(1, 0, 1, 0)
+    TabSwitchOverlay.Position = UDim2.new(0, 0, 0, 0)
+    TabSwitchOverlay.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
+    TabSwitchOverlay.BackgroundTransparency = 1
+    TabSwitchOverlay.BorderSizePixel = 0
+    TabSwitchOverlay.ZIndex = 50
+    TabSwitchOverlay.Parent = LayersReal
+
     LayersPageLayout.SortOrder = Enum.SortOrder.LayoutOrder
     LayersPageLayout.Name = "LayersPageLayout"
     LayersPageLayout.Parent = LayersFolder
-    LayersPageLayout.TweenTime = 0.5
+    LayersPageLayout.TweenTime = 0
     LayersPageLayout.EasingDirection = Enum.EasingDirection.InOut
     LayersPageLayout.EasingStyle = Enum.EasingStyle.Quad
 
@@ -1026,7 +1036,7 @@ function Menghub:Window(GuiConfig)
     ScrollTab.ChildRemoved:Connect(UpdateSize1)
 
     function GuiFunc:DestroyGui()
-        if CoreGui:FindFirstChild("Menghubb") then
+        if CoreGui:FindFirstChild(_G.HubName) then
             Menghubb:Destroy()
         end
     end
@@ -1463,6 +1473,7 @@ function Menghub:Window(GuiConfig)
                 end
             end
             if FrameChoose ~= nil and Tab.LayoutOrder ~= LayersPageLayout.CurrentPage.LayoutOrder then
+                -- reset tab highlights
                 for _, TabFrame in ScrollTab:GetChildren() do
                     if TabFrame.Name == "Tab" then
                         TweenService:Create(
@@ -1477,23 +1488,52 @@ function Menghub:Window(GuiConfig)
                     TweenInfo.new(0.6, Enum.EasingStyle.Back, Enum.EasingDirection.InOut),
                     { BackgroundTransparency = 0.9200000166893005 }
                 ):Play()
-                
+
                 FrameChoose.Parent = Tab
                 FrameChoose.Position = UDim2.new(0, 0, 0, 5)
                 FrameChoose.Size = UDim2.new(0, 3, 0, 20)
-                
+
+                -- flash overlay masuk cepet
+                TweenService:Create(
+                    TabSwitchOverlay,
+                    TweenInfo.new(0.08, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                    { BackgroundTransparency = 0.45 }
+                ):Play()
+                task.wait(0.08)
+
+                -- instant switch
                 LayersPageLayout:JumpToIndex(Tab.LayoutOrder)
+
+                -- slide up dari bawah
+                local newPage = LayersPageLayout.CurrentPage
+                if newPage and newPage:IsA("ScrollingFrame") then
+                    newPage.CanvasPosition = Vector2.new(0, 40)
+                    TweenService:Create(
+                        newPage,
+                        TweenInfo.new(0.28, Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
+                        { CanvasPosition = Vector2.new(0, 0) }
+                    ):Play()
+                end
+
+                -- overlay fade out barengan sama slide
+                TweenService:Create(
+                    TabSwitchOverlay,
+                    TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
+                    { BackgroundTransparency = 1 }
+                ):Play()
+
+                -- FrameChoose bounce
                 task.wait(0.05)
                 TweenService:Create(
                     FrameChoose,
-                    TweenInfo.new(0.35, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
-                    { Size = UDim2.new(0, 3, 0, 20) } 
+                    TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+                    { Size = UDim2.new(0, 3, 0, 22) }
                 ):Play()
                 task.wait(0.2)
                 TweenService:Create(
                     FrameChoose,
-                    TweenInfo.new(0.25, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
-                    { Size = UDim2.new(0, 3, 0, 18) } 
+                    TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.InOut),
+                    { Size = UDim2.new(0, 3, 0, 18) }
                 ):Play()
             end
         end)
