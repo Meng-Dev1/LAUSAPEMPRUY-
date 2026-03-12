@@ -1,0 +1,65 @@
+- run: |
+          python3 << 'EOF'
+          import json, requests, time
+
+          with open("fish_database.json") as f:
+              db = json.load(f)
+
+          # Load existing jika ada
+          try:
+              with open("fish_icons.json") as f:
+                  result = json.load(f)
+          except:
+              result = {}
+
+          # Kumpulin yang masih kosong
+          need_fetch = [(fid, d) for fid, d in db.items() 
+                        if d.get("iconId") and not result.get(fid, {}).get("imageUrl")]
+          
+          print(f"Need to fetch: {len(need_fetch)} fish")
+
+          def fetch_batch(batch):
+              ids = ",".join([d["iconId"] for _, d in batch])
+              url = f"https://thumbnails.roblox.com/v1/assets?assetIds={ids}&size=420x420&format=Png"
+              try:
+                  resp = requests.get(url, timeout=15).json()
+                  return {str(x["targetId"]): (x.get("imageUrl",""), x.get("state","")) 
+                          for x in resp.get("data", [])}
+              except:
+                  return {}
+
+          batches = [need_fetch[i:i+50] for i in range(0, len(need_fetch), 50)]
+          
+          # Retry sampai 5x untuk yang pending
+          for attempt in range(5):
+              still_pending = []
+              for batch in batches:
+                  url_map = fetch_batch(batch)
+                  for fid, d in batch:
+                      icon_id = d["iconId"]
+                      img_url, state = url_map.get(icon_id, ("", ""))
+                      if img_url and state == "Completed":
+                          result[fid] = {**d, "imageUrl": img_url}
+                          print(f"  ✓ [{fid}] {d['name']}")
+                      else:
+                          still_pending.append((fid, d))
+                  time.sleep(0.5)
+              
+              if not still_pending:
+                  break
+              
+              print(f"Attempt {attempt+1}: {len(still_pending)} still pending, waiting 10s...")
+              batches = [still_pending[i:i+50] for i in range(0, len(still_pending), 50)]
+              time.sleep(10)
+
+          # Isi yang tetap kosong
+          for fid, d in db.items():
+              if fid not in result:
+                  result[fid] = {**d, "imageUrl": ""}
+
+          with open("fish_icons.json", "w") as f:
+              json.dump(result, f, indent=2)
+          
+          success = sum(1 for v in result.values() if v.get("imageUrl"))
+          print(f"\nDone: {success}/{len(result)} thumbnails fetched")
+          EOF
