@@ -100,6 +100,7 @@ local Icons = {
     next      = "rbxassetid://12662718374",
     rod       = "rbxassetid://103247953194129",
     fish      = "rbxassetid://97167558235554",
+    mouse     = "rbxassetid://10088146947"
 }
 
 local UserInputService = game:GetService("UserInputService")
@@ -1955,48 +1956,69 @@ function Menghub:Window(GuiConfig)
                 ButtonConfig.SubTitle = ButtonConfig.SubTitle or nil
                 ButtonConfig.SubCallback = ButtonConfig.SubCallback or function() end
 
-                local ButtonFrame = Instance.new("Frame")
-                ButtonFrame.BackgroundTransparency = 1 
-                ButtonFrame.Size = UDim2.new(1, 0, 0, 42) 
-                ButtonFrame.LayoutOrder = CountItem
-                ButtonFrame.Parent = SectionAdd
-
                 local function CreateStyledButton(text, size, pos, callback)
                     local Btn = Instance.new("TextButton")
-                    Btn.Parent = ButtonFrame
+                    Btn.Parent = SectionAdd
                     Btn.Size = size
                     Btn.Position = pos
                     Btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                    Btn.BackgroundTransparency = 0.95
+                    Btn.BackgroundTransparency = 0.935
                     Btn.Font = Enum.Font.GothamMedium
-                    Btn.Text = text
-                    Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-                    Btn.TextSize = 12
+                    Btn.Text = ""
                     Btn.AutoButtonColor = false
+                    Btn.LayoutOrder = CountItem
 
                     local Corner = Instance.new("UICorner")
-                    Corner.CornerRadius = UDim.new(0, 6)
+                    Corner.CornerRadius = UDim.new(0, 4)
                     Corner.Parent = Btn
-                    
-                    local Stroke = Instance.new("UIStroke")
-                    Stroke.Color = Color3.fromRGB(255, 255, 255)
-                    Stroke.Transparency = 0.9
-                    Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-                    Stroke.Parent = Btn
 
-                    Btn.MouseEnter:Connect(function()
-                        Btn.BackgroundTransparency = 0.9
-                        Stroke.Transparency = 0.8
-                    end)
-                    Btn.MouseLeave:Connect(function()
-                        Btn.BackgroundTransparency = 0.95
-                        Stroke.Transparency = 0.9
-                    end)
+                    local Label = Instance.new("TextLabel")
+                    Label.Parent = Btn
+                    Label.Size = UDim2.new(1, -50, 1, 0)
+                    Label.Position = UDim2.new(0, 12, 0, 0)
+                    Label.BackgroundTransparency = 1
+                    Label.Font = Enum.Font.GothamMedium
+                    Label.Text = text
+                    Label.TextColor3 = Color3.fromRGB(255, 255, 255)
+                    Label.TextSize = 13
+                    Label.TextXAlignment = Enum.TextXAlignment.Left
+
+                    local Icon = Instance.new("ImageLabel")
+                    Icon.Parent = Btn
+                    Icon.Size = UDim2.new(0, 20, 0, 20)
+                    Icon.Position = UDim2.new(1, -32, 0.5, -10)
+                    Icon.BackgroundTransparency = 1
+                    Icon.Image = "rbxassetid://81380719613545"
+                    Icon.ImageColor3 = Color3.fromRGB(255, 255, 255)
+
+                    local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                    local originalSize = size
+
                     Btn.MouseButton1Down:Connect(function()
-                        Btn.BackgroundTransparency = 0.85
+                        TweenService:Create(Btn, tweenInfo, {
+                            Size = UDim2.new(
+                                originalSize.X.Scale, originalSize.X.Offset - 4,
+                                originalSize.Y.Scale, originalSize.Y.Offset - 4
+                            ),
+                            Position = UDim2.new(
+                                pos.X.Scale, pos.X.Offset + 2,
+                                pos.Y.Scale, pos.Y.Offset + 2
+                            )
+                        }):Play()
                     end)
+
                     Btn.MouseButton1Up:Connect(function()
-                        Btn.BackgroundTransparency = 0.9
+                        TweenService:Create(Btn, tweenInfo, {
+                            Size = originalSize,
+                            Position = pos
+                        }):Play()
+                    end)
+
+                    Btn.MouseLeave:Connect(function()
+                        TweenService:Create(Btn, tweenInfo, {
+                            Size = originalSize,
+                            Position = pos
+                        }):Play()
                     end)
 
                     Btn.MouseButton1Click:Connect(callback)
@@ -2004,10 +2026,66 @@ function Menghub:Window(GuiConfig)
                 end
 
                 if ButtonConfig.SubTitle then
-                    CreateStyledButton(ButtonConfig.Title, UDim2.new(0.5, -5, 1, -5), UDim2.new(0, 0, 0, 2.5), ButtonConfig.Callback)
-                    CreateStyledButton(ButtonConfig.SubTitle, UDim2.new(0.5, -5, 1, -5), UDim2.new(0.5, 5, 0, 2.5), ButtonConfig.SubCallback)
+                    local ButtonFrame = Instance.new("Frame")
+                    ButtonFrame.BackgroundTransparency = 1
+                    ButtonFrame.Size = UDim2.new(1, 0, 0, 42)
+                    ButtonFrame.LayoutOrder = CountItem
+                    ButtonFrame.Parent = SectionAdd
+
+                    local function CreateMiniButton(text, size, pos, callback)
+                        local Btn = Instance.new("TextButton")
+                        Btn.Parent = ButtonFrame
+                        Btn.Size = size
+                        Btn.Position = pos
+                        Btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                        Btn.BackgroundTransparency = 0.935
+                        Btn.Font = Enum.Font.GothamMedium
+                        Btn.Text = text
+                        Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+                        Btn.TextSize = 12
+                        Btn.AutoButtonColor = false
+
+                        local Corner = Instance.new("UICorner")
+                        Corner.CornerRadius = UDim.new(0, 4)
+                        Corner.Parent = Btn
+
+                        local tweenInfo = TweenInfo.new(0.1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+                        local originalSize = size
+
+                        Btn.MouseButton1Down:Connect(function()
+                            TweenService:Create(Btn, tweenInfo, {
+                                Size = UDim2.new(
+                                    originalSize.X.Scale, originalSize.X.Offset - 4,
+                                    originalSize.Y.Scale, originalSize.Y.Offset - 4
+                                ),
+                                Position = UDim2.new(
+                                    pos.X.Scale, pos.X.Offset + 2,
+                                    pos.Y.Scale, pos.Y.Offset + 2
+                                )
+                            }):Play()
+                        end)
+
+                        Btn.MouseButton1Up:Connect(function()
+                            TweenService:Create(Btn, tweenInfo, {
+                                Size = originalSize,
+                                Position = pos
+                            }):Play()
+                        end)
+
+                        Btn.MouseLeave:Connect(function()
+                            TweenService:Create(Btn, tweenInfo, {
+                                Size = originalSize,
+                                Position = pos
+                            }):Play()
+                        end)
+
+                        Btn.MouseButton1Click:Connect(callback)
+                    end
+
+                    CreateMiniButton(ButtonConfig.Title, UDim2.new(0.5, -3, 1, -5), UDim2.new(0, 0, 0, 2.5), ButtonConfig.Callback)
+                    CreateMiniButton(ButtonConfig.SubTitle, UDim2.new(0.5, -3, 1, -5), UDim2.new(0.5, 3, 0, 2.5), ButtonConfig.SubCallback)
                 else
-                    CreateStyledButton(ButtonConfig.Title, UDim2.new(1, 0, 1, -5), UDim2.new(0, 0, 0, 2.5), ButtonConfig.Callback)
+                    CreateStyledButton(ButtonConfig.Title, UDim2.new(1, 0, 0, 42), UDim2.new(0, 0, 0, 0), ButtonConfig.Callback)
                 end
 
                 CountItem = CountItem + 1
