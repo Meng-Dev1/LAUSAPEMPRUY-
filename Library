@@ -183,7 +183,7 @@ local function MakeDraggable(topbarobject, object)
             defSizeX, defSizeY = 470, 270
         else
             minSizeX, minSizeY = 100, 100
-            defSizeX, defSizeY = 640, 400
+            defSizeX, defSizeY = 586, 364
         end
 
         object.Size = UDim2.new(0, defSizeX, 0, defSizeY)
