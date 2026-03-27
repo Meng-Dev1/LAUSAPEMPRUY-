@@ -1963,7 +1963,7 @@ function Menghub:Window(GuiConfig)
                     Btn.Position = pos
                     Btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                     Btn.BackgroundTransparency = 0.935
-                    Btn.Font = Enum.Font.GothamMedium
+                    Btn.Font = Enum.Font.GothamBold
                     Btn.Text = ""
                     Btn.AutoButtonColor = false
                     Btn.LayoutOrder = CountItem
@@ -1977,7 +1977,7 @@ function Menghub:Window(GuiConfig)
                     Label.Size = UDim2.new(1, -50, 1, 0)
                     Label.Position = UDim2.new(0, 12, 0, 0)
                     Label.BackgroundTransparency = 1
-                    Label.Font = Enum.Font.GothamMedium
+                    Label.Font = Enum.Font.GothamBold
                     Label.Text = text
                     Label.TextColor3 = Color3.fromRGB(255, 255, 255)
                     Label.TextSize = 13
@@ -2039,7 +2039,7 @@ function Menghub:Window(GuiConfig)
                         Btn.Position = pos
                         Btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                         Btn.BackgroundTransparency = 0.935
-                        Btn.Font = Enum.Font.GothamMedium
+                        Btn.Font = Enum.Font.GothamBold
                         Btn.Text = text
                         Btn.TextColor3 = Color3.fromRGB(255, 255, 255)
                         Btn.TextSize = 12
