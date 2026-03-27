@@ -602,6 +602,7 @@ function Menghub:Window(GuiConfig)
     TitleIcon.Size = UDim2.new(0, 20, 0, 20)
     TitleIcon.Image = GuiConfig.Icon
 
+    -- // Background Image System (Posisi Mojok & Skala Proporsional kayak Ref)
     local ImageWrapper = Instance.new("Frame")
     ImageWrapper.Name = "ImageWrapper"
     ImageWrapper.Parent = Main
@@ -611,35 +612,29 @@ function Menghub:Window(GuiConfig)
     ImageWrapper.ZIndex = 0
     ImageWrapper.ClipsDescendants = true
 
+    local ThemeImage = Instance.new("ImageLabel")
     ThemeImage.Name = "ThemeImage"
     ThemeImage.Parent = ImageWrapper
     ThemeImage.BackgroundTransparency = 1
-    ThemeImage.AnchorPoint = Vector2.new(0.5, 0.5)
-    ThemeImage.Position = UDim2.new(0.5, 0, 0.5, 0)
-    ThemeImage.Size = UDim2.new(1, 0, 1, 0)
-    ThemeImage.ZIndex = 0
-    ThemeImage.Image = "rbxassetid://76239481062153"
-    ThemeImage.ImageTransparency = 0.55
+
+    ThemeImage.AnchorPoint = Vector2.new(1, 1)
+    ThemeImage.Position = UDim2.new(1, 0, 1, 0)
+
+    ThemeImage.Size = UDim2.new(0.65, 0, 0.95, 0)
+
+    ThemeImage.ZIndex = 1
+    ThemeImage.Image = "rbxassetid://132409051529563"
+    ThemeImage.ImageTransparency = 0.15
     ThemeImage.ScaleType = Enum.ScaleType.Crop
 
     local Gradient = Instance.new("UIGradient")
-    Gradient.Rotation = 90
+    Gradient.Rotation = 45
     Gradient.Transparency = NumberSequence.new({
-        NumberSequenceKeypoint.new(0,    0.95),
-        NumberSequenceKeypoint.new(0.4,  0.75),
-        NumberSequenceKeypoint.new(0.7,  0.45),
-        NumberSequenceKeypoint.new(1,    0.2),
+        NumberSequenceKeypoint.new(0, 1),    
+        NumberSequenceKeypoint.new(0.6, 0.8),
+        NumberSequenceKeypoint.new(1, 0) 
     })
     Gradient.Parent = ThemeImage
-
-    local Overlay = Instance.new("Frame")
-    Overlay.Name = "DarkOverlay"
-    Overlay.Parent = ImageWrapper
-    Overlay.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-    Overlay.BackgroundTransparency = 0.55
-    Overlay.BorderSizePixel = 0
-    Overlay.Size = UDim2.new(1, 0, 1, 0)
-    Overlay.ZIndex = 1
 
     TextLabel.Font = Enum.Font.GothamBold
     TextLabel.Text = GuiConfig.Title
