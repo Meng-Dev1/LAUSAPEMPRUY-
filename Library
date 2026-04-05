@@ -1153,6 +1153,8 @@ function Menghub:Window(GuiConfig)
         Cancel.MouseButton1Click:Connect(function()
             Overlay:Destroy()
         end)
+
+        getgenv().AntiAnalyticActive = false
     end)
 
     local ToggleKey = Enum.KeyCode.F3
