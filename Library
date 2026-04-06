@@ -142,8 +142,9 @@ local function MakeDraggable(topbarobject, object)
                 StartPosition.Y.Scale,
                 StartPosition.Y.Offset + Delta.Y
             )
-            local Tween = TweenService:Create(object, TweenInfo.new(0.2), { Position = pos })
-            Tween:Play()
+            -- local Tween = TweenService:Create(object, TweenInfo.new(0.2), { Position = pos })
+            -- Tween:Play()
+            object.Position = pos
         end
 
         topbarobject.InputBegan:Connect(function(input)
@@ -591,6 +592,7 @@ function Menghub:Window(GuiConfig)
     Top.BorderSizePixel = 0
     Top.Size = UDim2.new(1, 0, 0, 38)
     Top.Name = "Top"
+    Top.Active = true
     Top.Parent = Main
 
     TitleIcon.Name = "TitleIcon"
