@@ -2398,6 +2398,14 @@ function Menghub:Window(GuiConfig)
                 SliderFrame.Name = "SliderFrame"
                 SliderFrame.Parent = Slider
 
+                local SliderHitbox = Instance.new("Frame")
+                SliderHitbox.BackgroundTransparency = 1
+                SliderHitbox.AnchorPoint = Vector2.new(1, 0.5)
+                SliderHitbox.Position = UDim2.new(1, -20, 0.5, 0)
+                SliderHitbox.Size = UDim2.new(0, 100, 0, 40)  -- 40px tinggi, gampang kesentuh
+                SliderHitbox.ZIndex = SliderFrame.ZIndex + 1
+                SliderHitbox.Parent = Slider
+
                 UICorner17.Parent = SliderFrame
 
                 SliderDraggable.AnchorPoint = Vector2.new(0, 0.5)
@@ -2416,7 +2424,7 @@ function Menghub:Window(GuiConfig)
                 SliderCircle.BorderColor3 = Color3.fromRGB(0, 0, 0)
                 SliderCircle.BorderSizePixel = 0
                 SliderCircle.Position = UDim2.new(1, 4, 0.5, 0)
-                SliderCircle.Size = UDim2.new(0, 8, 0, 8)
+                SliderCircle.Size = UDim2.new(0, 14, 0, 14)
                 SliderCircle.Name = "SliderCircle"
                 SliderCircle.Parent = SliderDraggable
 
@@ -2445,31 +2453,30 @@ function Menghub:Window(GuiConfig)
                     -- SaveConfig()
                 end
 
-                SliderFrame.InputBegan:Connect(function(Input)
+                SliderHitbox.InputBegan:Connect(function(Input)
                     if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                         Dragging = true
                         TweenService:Create(
                             SliderCircle,
                             TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-                            { Size = UDim2.new(0, 14, 0, 14) }
+                            { Size = UDim2.new(0, 20, 0, 20) }
                         ):Play()
                         local SizeScale = math.clamp(
                             (Input.Position.X - SliderFrame.AbsolutePosition.X) / SliderFrame.AbsoluteSize.X,
-                            0,
-                            1
+                            0, 1
                         )
                         SliderFunc:Set(SliderConfig.Min + ((SliderConfig.Max - SliderConfig.Min) * SizeScale))
                     end
                 end)
 
-                SliderFrame.InputEnded:Connect(function(Input)
+                SliderHitbox.InputEnded:Connect(function(Input)
                     if Input.UserInputType == Enum.UserInputType.MouseButton1 or Input.UserInputType == Enum.UserInputType.Touch then
                         Dragging = false
                         SliderConfig.Callback(SliderFunc.Value)
                         TweenService:Create(
                             SliderCircle,
                             TweenInfo.new(0.2, Enum.EasingStyle.Quad, Enum.EasingDirection.Out),
-                            { Size = UDim2.new(0, 8, 0, 8) }
+                            { Size = UDim2.new(0, 14, 0, 14) }
                         ):Play()
                     end
                 end)
