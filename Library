@@ -525,9 +525,9 @@ function Menghub:Window(GuiConfig)
     local ThemeImage = Instance.new("ImageLabel");
 
     Menghubb.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    Menghubb.Name = _G.HubName
+    Menghubb.Name = "MengHubGui"
     Menghubb.ResetOnSpawn = false
-    Menghubb.Parent = game:GetService("CoreGui"):WaitForChild("RobloxGui")
+    Menghubb.Parent = game:GetService("CoreGui")
 
     DropShadowHolder.BackgroundTransparency = 1
     DropShadowHolder.BorderSizePixel = 0
@@ -1034,7 +1034,7 @@ function Menghub:Window(GuiConfig)
     ScrollTab.ChildRemoved:Connect(UpdateSize1)
 
     function GuiFunc:DestroyGui()
-        if CoreGui:FindFirstChild(_G.HubName) then
+        if CoreGui:FindFirstChild("MengHubGui") then
             Menghubb:Destroy()
         end
     end
@@ -1156,7 +1156,7 @@ function Menghub:Window(GuiConfig)
             Overlay:Destroy()
         end)
 
-        getgenv().AntiAnalyticActive = false
+        -- getgenv().AntiAnalyticActive = false
     end)
 
     local ToggleKey = Enum.KeyCode.F3
