@@ -60,6 +60,8 @@ function LoadConfigElements()
                     element:Set(element.Default or "")
                 elseif element.Type == "Input" then
                     element:Set("")
+                elseif element.Type == "Keybind" then
+                    element:Set("None")
                 end
             end
         end
@@ -2920,6 +2922,191 @@ function Menghub:Window(GuiConfig)
                 DropdownFunc.Type = "Dropdown"
                 Elements[configKey] = DropdownFunc
                 return DropdownFunc
+            end
+
+            function Items:AddKeybind(KeybindConfig)
+                KeybindConfig = KeybindConfig or {}
+                KeybindConfig.Title   = KeybindConfig.Title   or "Keybind"
+                KeybindConfig.Content = KeybindConfig.Content or ""
+                KeybindConfig.Default = KeybindConfig.Default or "None"
+                KeybindConfig.Callback = KeybindConfig.Callback or function() end
+
+                local configKey = "Keybind_" .. KeybindConfig.Title
+                if ConfigData[configKey] ~= nil then
+                    KeybindConfig.Default = ConfigData[configKey]
+                end
+
+                local KeybindFunc = { Value = KeybindConfig.Default }
+                local isListening = false
+
+                -- ── Frame utama ──────────────────────────────────────────────
+                local Keybind = Instance.new("Frame")
+                Keybind.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                Keybind.BackgroundTransparency = 0.935
+                Keybind.BorderSizePixel = 0
+                Keybind.LayoutOrder = CountItem
+                Keybind.Size = UDim2.new(1, 0, 0, 46)
+                Keybind.Name = "Keybind"
+                Keybind.Parent = SectionAdd
+
+                local UICornerKB = Instance.new("UICorner")
+                UICornerKB.CornerRadius = UDim.new(0, 4)
+                UICornerKB.Parent = Keybind
+
+                -- ── Label judul ──────────────────────────────────────────────
+                local KeybindTitle = Instance.new("TextLabel")
+                KeybindTitle.Font = Enum.Font.GothamBold
+                KeybindTitle.Text = KeybindConfig.Title
+                KeybindTitle.TextSize = 13
+                KeybindTitle.TextColor3 = Color3.fromRGB(231, 231, 231)
+                KeybindTitle.TextXAlignment = Enum.TextXAlignment.Left
+                KeybindTitle.TextYAlignment = Enum.TextYAlignment.Top
+                KeybindTitle.BackgroundTransparency = 1
+                KeybindTitle.Position = UDim2.new(0, 10, 0, 10)
+                KeybindTitle.Size = UDim2.new(1, -120, 0, 13)
+                KeybindTitle.Name = "KeybindTitle"
+                KeybindTitle.Parent = Keybind
+
+                -- ── Label konten/deskripsi ────────────────────────────────────
+                local KeybindContent = Instance.new("TextLabel")
+                KeybindContent.Font = Enum.Font.GothamBold
+                KeybindContent.Text = KeybindConfig.Content
+                KeybindContent.TextColor3 = Color3.fromRGB(255, 255, 255)
+                KeybindContent.TextSize = 12
+                KeybindContent.TextTransparency = 0.6
+                KeybindContent.TextXAlignment = Enum.TextXAlignment.Left
+                KeybindContent.BackgroundTransparency = 1
+                KeybindContent.Position = UDim2.new(0, 10, 0, 26)
+                KeybindContent.Size = UDim2.new(1, -120, 0, 12)
+                KeybindContent.Name = "KeybindContent"
+                KeybindContent.Parent = Keybind
+
+                -- ── Kotak tombol (kanan) ──────────────────────────────────────
+                local KeyBox = Instance.new("Frame")
+                KeyBox.AnchorPoint = Vector2.new(1, 0.5)
+                KeyBox.BackgroundTransparency = 0.92
+                KeyBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                KeyBox.BorderSizePixel = 0
+                KeyBox.Position = UDim2.new(1, -10, 0.5, 0)
+                KeyBox.Size = UDim2.new(0, 90, 0, 26)
+                KeyBox.Name = "KeyBox"
+                KeyBox.Parent = Keybind
+
+                local UICornerBox = Instance.new("UICorner")
+                UICornerBox.CornerRadius = UDim.new(0, 4)
+                UICornerBox.Parent = KeyBox
+
+                local UIStrokeBox = Instance.new("UIStroke")
+                UIStrokeBox.Color = Color3.fromRGB(255, 255, 255)
+                UIStrokeBox.Thickness = 1.5
+                UIStrokeBox.Transparency = 0.85
+                UIStrokeBox.Parent = KeyBox
+
+                local KeyLabel = Instance.new("TextLabel")
+                KeyLabel.Font = Enum.Font.GothamBold
+                KeyLabel.Text = KeybindFunc.Value
+                KeyLabel.TextSize = 12
+                KeyLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+                KeyLabel.TextXAlignment = Enum.TextXAlignment.Center
+                KeyLabel.BackgroundTransparency = 1
+                KeyLabel.Size = UDim2.new(1, 0, 1, 0)
+                KeyLabel.Name = "KeyLabel"
+                KeyLabel.Parent = KeyBox
+
+                -- ── Invisible button di seluruh area ─────────────────────────
+                local KeybindButton = Instance.new("TextButton")
+                KeybindButton.Text = ""
+                KeybindButton.BackgroundTransparency = 1
+                KeybindButton.Size = UDim2.new(1, 0, 1, 0)
+                KeybindButton.Name = "KeybindButton"
+                KeybindButton.Parent = Keybind
+
+                -- ── Fungsi Set ────────────────────────────────────────────────
+                function KeybindFunc:Set(Value)
+                    KeybindFunc.Value = Value or "None"
+                    KeyLabel.Text = KeybindFunc.Value
+                    ConfigData[configKey] = KeybindFunc.Value
+
+                    -- visual: kalau udah di-bind, warnain kotak sama title
+                    if KeybindFunc.Value ~= "None" then
+                        TweenService:Create(UIStrokeBox, TweenInfo.new(0.2), { Color = GuiConfig.Color, Transparency = 0 }):Play()
+                        TweenService:Create(KeyLabel, TweenInfo.new(0.2), { TextColor3 = GuiConfig.Color }):Play()
+                    else
+                        TweenService:Create(UIStrokeBox, TweenInfo.new(0.2), { Color = Color3.fromRGB(255, 255, 255), Transparency = 0.85 }):Play()
+                        TweenService:Create(KeyLabel, TweenInfo.new(0.2), { TextColor3 = Color3.fromRGB(220, 220, 220) }):Play()
+                    end
+
+                    if typeof(KeybindConfig.Callback) == "function" then
+                        task.spawn(function()
+                            pcall(KeybindConfig.Callback, KeybindFunc.Value)
+                        end)
+                    end
+                end
+
+                -- ── Logic klik → listening ────────────────────────────────────
+                local inputConn
+                KeybindButton.Activated:Connect(function()
+                    if isListening then return end
+                    isListening = true
+
+                    -- tampilkan "..."
+                    KeyLabel.Text = "..."
+                    TweenService:Create(UIStrokeBox, TweenInfo.new(0.15), { Color = GuiConfig.Color, Transparency = 0.3 }):Play()
+                    TweenService:Create(KeyBox, TweenInfo.new(0.15), { BackgroundTransparency = 0.75 }):Play()
+
+                    -- dengarkan input berikutnya
+                    inputConn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+                        if gameProcessed then return end
+
+                        local keyName
+
+                        if input.UserInputType == Enum.UserInputType.Keyboard then
+                            -- ambil nama key yang bersih, misal "G", "LeftShift", dll.
+                            keyName = tostring(input.KeyCode):gsub("Enum.KeyCode.", "")
+                        elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
+                            keyName = "MB1"
+                        elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
+                            keyName = "MB2"
+                        end
+
+                        if keyName then
+                            -- Escape = batalin / clear
+                            if keyName == "Escape" then
+                                keyName = "None"
+                            end
+
+                            inputConn:Disconnect()
+                            isListening = false
+
+                            TweenService:Create(KeyBox, TweenInfo.new(0.15), { BackgroundTransparency = 0.92 }):Play()
+                            KeybindFunc:Set(keyName)
+                        end
+                    end)
+                end)
+
+                -- ── Jalankan callback saat key ditekan di game ────────────────
+                UserInputService.InputBegan:Connect(function(input, gameProcessed)
+                    if gameProcessed or isListening then return end
+                    if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
+                
+                    local pressedKey = tostring(input.KeyCode):gsub("Enum.KeyCode.", "")
+                    if pressedKey == KeybindFunc.Value and KeybindFunc.Value ~= "None" then
+                        local fn = KeybindConfig.OnPress or KeybindConfig.Callback
+                        if typeof(fn) == "function" then
+                            task.spawn(function()
+                                pcall(fn, KeybindFunc.Value)
+                            end)
+                        end
+                    end
+                end)
+
+                -- init visual
+                KeybindFunc:Set(KeybindFunc.Value)
+
+                CountItem = CountItem + 1
+                KeybindFunc.Type = "Keybind"
+                Elements[configKey] = KeybindFunc
+                return KeybindFunc
             end
 
             function Items:AddDivider()
