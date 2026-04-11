@@ -3065,7 +3065,7 @@ function Menghub:Window(GuiConfig)
                         end
 
                         if keyName then
-                            if keyName == "Escape" then
+                            if keyName == "Escape" or keyName == "Backspace" then
                                 keyName = "None"
                             end
 
