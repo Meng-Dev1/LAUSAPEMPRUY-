@@ -3049,19 +3049,14 @@ function Menghub:Window(GuiConfig)
                     if isListening then return end
                     isListening = true
 
-                    -- tampilkan "..."
                     KeyLabel.Text = "..."
                     TweenService:Create(UIStrokeBox, TweenInfo.new(0.15), { Color = GuiConfig.Color, Transparency = 0.3 }):Play()
                     TweenService:Create(KeyBox, TweenInfo.new(0.15), { BackgroundTransparency = 0.75 }):Play()
 
-                    -- dengarkan input berikutnya
                     inputConn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-                        if gameProcessed then return end
-
                         local keyName
 
                         if input.UserInputType == Enum.UserInputType.Keyboard then
-                            -- ambil nama key yang bersih, misal "G", "LeftShift", dll.
                             keyName = tostring(input.KeyCode):gsub("Enum.KeyCode.", "")
                         elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
                             keyName = "MB1"
@@ -3070,7 +3065,6 @@ function Menghub:Window(GuiConfig)
                         end
 
                         if keyName then
-                            -- Escape = batalin / clear
                             if keyName == "Escape" then
                                 keyName = "None"
                             end
