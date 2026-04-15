@@ -1148,6 +1148,26 @@ function Menghub:Window(GuiConfig)
             end
             ScriptLoaded = false
             NoclipEnabled = false
+
+            -- Noclip Destroy
+            if _G.NoclipConnection then
+                _G.NoclipConnection:Disconnect()
+                _G.NoclipConnection = nil
+            end
+            local char = LocalPlayer.Character
+            if char then
+                for _, v in pairs(char:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        if _G.OriginalCollision[v] ~= nil then
+                            v.CanCollide = _G.OriginalCollision[v]
+                        else
+                            v.CanCollide = true
+                        end
+                    end
+                end
+                _G.OriginalCollision = {}
+            end
+
             if Menghubb then Menghubb:Destroy() end
             if game.CoreGui:FindFirstChild("ToggleUIButton") then
                 game.CoreGui.ToggleUIButton:Destroy()
@@ -2939,7 +2959,6 @@ function Menghub:Window(GuiConfig)
                 local KeybindFunc = { Value = KeybindConfig.Default }
                 local isListening = false
 
-                -- ── Frame utama ──────────────────────────────────────────────
                 local Keybind = Instance.new("Frame")
                 Keybind.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                 Keybind.BackgroundTransparency = 0.935
@@ -2953,7 +2972,6 @@ function Menghub:Window(GuiConfig)
                 UICornerKB.CornerRadius = UDim.new(0, 4)
                 UICornerKB.Parent = Keybind
 
-                -- ── Label judul ──────────────────────────────────────────────
                 local KeybindTitle = Instance.new("TextLabel")
                 KeybindTitle.Font = Enum.Font.GothamBold
                 KeybindTitle.Text = KeybindConfig.Title
@@ -2967,7 +2985,6 @@ function Menghub:Window(GuiConfig)
                 KeybindTitle.Name = "KeybindTitle"
                 KeybindTitle.Parent = Keybind
 
-                -- ── Label konten/deskripsi ────────────────────────────────────
                 local KeybindContent = Instance.new("TextLabel")
                 KeybindContent.Font = Enum.Font.GothamBold
                 KeybindContent.Text = KeybindConfig.Content
@@ -2981,7 +2998,6 @@ function Menghub:Window(GuiConfig)
                 KeybindContent.Name = "KeybindContent"
                 KeybindContent.Parent = Keybind
 
-                -- ── Kotak tombol (kanan) ──────────────────────────────────────
                 local KeyBox = Instance.new("Frame")
                 KeyBox.AnchorPoint = Vector2.new(1, 0.5)
                 KeyBox.BackgroundTransparency = 0.92
@@ -3013,7 +3029,6 @@ function Menghub:Window(GuiConfig)
                 KeyLabel.Name = "KeyLabel"
                 KeyLabel.Parent = KeyBox
 
-                -- ── Invisible button di seluruh area ─────────────────────────
                 local KeybindButton = Instance.new("TextButton")
                 KeybindButton.Text = ""
                 KeybindButton.BackgroundTransparency = 1
@@ -3021,13 +3036,11 @@ function Menghub:Window(GuiConfig)
                 KeybindButton.Name = "KeybindButton"
                 KeybindButton.Parent = Keybind
 
-                -- ── Fungsi Set ────────────────────────────────────────────────
                 function KeybindFunc:Set(Value)
                     KeybindFunc.Value = Value or "None"
                     KeyLabel.Text = KeybindFunc.Value
                     ConfigData[configKey] = KeybindFunc.Value
 
-                    -- visual: kalau udah di-bind, warnain kotak sama title
                     if KeybindFunc.Value ~= "None" then
                         TweenService:Create(UIStrokeBox, TweenInfo.new(0.2), { Color = GuiConfig.Color, Transparency = 0 }):Play()
                         TweenService:Create(KeyLabel, TweenInfo.new(0.2), { TextColor3 = GuiConfig.Color }):Play()
@@ -3043,7 +3056,6 @@ function Menghub:Window(GuiConfig)
                     end
                 end
 
-                -- ── Logic klik → listening ────────────────────────────────────
                 local inputConn
                 KeybindButton.Activated:Connect(function()
                     if isListening then return end
@@ -3065,7 +3077,7 @@ function Menghub:Window(GuiConfig)
                         end
 
                         if keyName then
-                            if keyName == "Escape" or keyName == "Backspace" then
+                            if keyName == "Escape" then
                                 keyName = "None"
                             end
 
@@ -3078,7 +3090,6 @@ function Menghub:Window(GuiConfig)
                     end)
                 end)
 
-                -- ── Jalankan callback saat key ditekan di game ────────────────
                 UserInputService.InputBegan:Connect(function(input, gameProcessed)
                     if gameProcessed or isListening then return end
                     if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
@@ -3094,7 +3105,6 @@ function Menghub:Window(GuiConfig)
                     end
                 end)
 
-                -- init visual
                 KeybindFunc:Set(KeybindFunc.Value)
 
                 CountItem = CountItem + 1
