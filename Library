@@ -1149,25 +1149,6 @@ function Menghub:Window(GuiConfig)
             ScriptLoaded = false
             NoclipEnabled = false
 
-            -- Noclip Destroy
-            if _G.NoclipConnection then
-                _G.NoclipConnection:Disconnect()
-                _G.NoclipConnection = nil
-            end
-            local char = LocalPlayer.Character
-            if char then
-                for _, v in pairs(char:GetDescendants()) do
-                    if v:IsA("BasePart") then
-                        if _G.OriginalCollision[v] ~= nil then
-                            v.CanCollide = _G.OriginalCollision[v]
-                        else
-                            v.CanCollide = true
-                        end
-                    end
-                end
-                _G.OriginalCollision = {}
-            end
-
             if Menghubb then Menghubb:Destroy() end
             if game.CoreGui:FindFirstChild("ToggleUIButton") then
                 game.CoreGui.ToggleUIButton:Destroy()
