@@ -3158,6 +3158,99 @@ function Menghub:Window(GuiConfig)
         return Sections
     end
 
+    --// Tag
+    function Tabs:Tag(TagConfig)
+        TagConfig = TagConfig or {}
+        TagConfig.Title  = TagConfig.Title  or "Tag"
+        TagConfig.Icon   = TagConfig.Icon   or ""
+        TagConfig.Color  = TagConfig.Color  or Color3.fromRGB(255, 255, 255)
+        TagConfig.Radius = math.clamp(TagConfig.Radius or 13, 0, 13)
+
+        -- Container tag (di dalam Top bar, sebelah kiri tombol Min)
+        local TagFrame = Instance.new("Frame")
+        TagFrame.Name = "TagFrame"
+        TagFrame.AnchorPoint = Vector2.new(1, 0.5)
+        TagFrame.Position = UDim2.new(1, -70, 0.5, 0)
+        TagFrame.BackgroundColor3 = TagConfig.Color
+        TagFrame.BackgroundTransparency = 0.15
+        TagFrame.BorderSizePixel = 0
+        TagFrame.AutomaticSize = Enum.AutomaticSize.X
+        TagFrame.Size = UDim2.new(0, 0, 0, 22)
+        TagFrame.ClipsDescendants = false
+        TagFrame.ZIndex = 5
+        TagFrame.Parent = Top
+
+        local TagCorner = Instance.new("UICorner")
+        TagCorner.CornerRadius = UDim.new(0, TagConfig.Radius)
+        TagCorner.Parent = TagFrame
+
+        local TagStroke = Instance.new("UIStroke")
+        TagStroke.Color = TagConfig.Color
+        TagStroke.Thickness = 1.5
+        TagStroke.Transparency = 0.5
+        TagStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        TagStroke.Parent = TagFrame
+
+        local TagPadding = Instance.new("UIPadding")
+        TagPadding.PaddingLeft  = UDim.new(0, 8)
+        TagPadding.PaddingRight = UDim.new(0, 8)
+        TagPadding.Parent = TagFrame
+
+        local TagLayout = Instance.new("UIListLayout")
+        TagLayout.FillDirection = Enum.FillDirection.Horizontal
+        TagLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+        TagLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        TagLayout.Padding = UDim.new(0, 5)
+        TagLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        TagLayout.Parent = TagFrame
+
+        -- Icon (opsional)
+        if TagConfig.Icon ~= "" then
+            local iconImg = Instance.new("ImageLabel")
+            iconImg.Name = "TagIcon"
+            iconImg.BackgroundTransparency = 1
+            iconImg.Size = UDim2.new(0, 14, 0, 14)
+            iconImg.ZIndex = 6
+            iconImg.LayoutOrder = 0
+            if Icons[TagConfig.Icon] then
+                iconImg.Image = Icons[TagConfig.Icon]
+            else
+                iconImg.Image = "rbxassetid://" .. tostring(TagConfig.Icon)
+            end
+            iconImg.ImageColor3 = Color3.fromRGB(255, 255, 255)
+            iconImg.ScaleType = Enum.ScaleType.Fit
+            iconImg.Parent = TagFrame
+        end
+
+        -- Label teks
+        local TagLabel = Instance.new("TextLabel")
+        TagLabel.Name = "TagLabel"
+        TagLabel.BackgroundTransparency = 1
+        TagLabel.Font = Enum.Font.GothamBold
+        TagLabel.Text = TagConfig.Title
+        TagLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        TagLabel.TextSize = 12
+        TagLabel.AutomaticSize = Enum.AutomaticSize.X
+        TagLabel.Size = UDim2.new(0, 0, 1, 0)
+        TagLabel.ZIndex = 6
+        TagLabel.LayoutOrder = 1
+        TagLabel.Parent = TagFrame
+
+        local TagFunc = {}
+        function TagFunc:Set(newTitle, newColor)
+            if newTitle then TagLabel.Text = newTitle end
+            if newColor then
+                TagFrame.BackgroundColor3 = newColor
+                TagStroke.Color = newColor
+            end
+        end
+        function TagFunc:Destroy()
+            TagFrame:Destroy()
+        end
+
+        return TagFunc
+    end
+
     return Tabs
 end
 
