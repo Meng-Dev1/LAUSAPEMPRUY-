@@ -3159,6 +3159,27 @@ function Menghub:Window(GuiConfig)
     end
 
     --// Tag
+    local AllTags = {}  -- list semua TagFrame yang udah dibuat
+
+    local function RepositionAllTags()
+        -- Jalankan di thread terpisah, tunggu 1 frame biar AbsoluteSize ke-update
+        task.spawn(function()
+            task.wait()
+            -- Hitung ulang posisi semua tag dari kanan ke kiri
+            -- Tombol Close di X=1,-8 size 25px, Min di X=1,-38 size 25px
+            -- Jadi kita mulai dari offset -68 (sebelah kiri Min + gap)
+            local offsetX = -68
+            for i = 1, #AllTags do
+                local frame = AllTags[i]
+                if frame and frame.Parent then
+                    local w = frame.AbsoluteSize.X
+                    frame.Position = UDim2.new(1, offsetX - w, 0.5, 0)
+                    offsetX = offsetX - w - 6
+                end
+            end
+        end)
+    end
+
     function Tabs:Tag(TagConfig)
         TagConfig = TagConfig or {}
         TagConfig.Title  = TagConfig.Title  or "Tag"
@@ -3166,11 +3187,11 @@ function Menghub:Window(GuiConfig)
         TagConfig.Color  = TagConfig.Color  or Color3.fromRGB(255, 255, 255)
         TagConfig.Radius = math.clamp(TagConfig.Radius or 13, 0, 13)
 
-        -- Container tag (di dalam Top bar, sebelah kiri tombol Min)
+        -- Container tag (pakai AutomaticSize biar lebarnya akurat)
         local TagFrame = Instance.new("Frame")
         TagFrame.Name = "TagFrame"
-        TagFrame.AnchorPoint = Vector2.new(1, 0.5)
-        TagFrame.Position = UDim2.new(1, -70, 0.5, 0)
+        TagFrame.AnchorPoint = Vector2.new(0, 0.5)
+        TagFrame.Position = UDim2.new(1, 0, 0.5, 0)  -- sementara taruh di luar, nanti direposisi
         TagFrame.BackgroundColor3 = TagConfig.Color
         TagFrame.BackgroundTransparency = 0.15
         TagFrame.BorderSizePixel = 0
@@ -3236,6 +3257,10 @@ function Menghub:Window(GuiConfig)
         TagLabel.LayoutOrder = 1
         TagLabel.Parent = TagFrame
 
+        -- Daftarkan tag ini lalu reposisi semua
+        table.insert(AllTags, TagFrame)
+        RepositionAllTags()
+
         local TagFunc = {}
         function TagFunc:Set(newTitle, newColor)
             if newTitle then TagLabel.Text = newTitle end
@@ -3245,7 +3270,11 @@ function Menghub:Window(GuiConfig)
             end
         end
         function TagFunc:Destroy()
+            for i, v in ipairs(AllTags) do
+                if v == TagFrame then table.remove(AllTags, i) break end
+            end
             TagFrame:Destroy()
+            RepositionAllTags()
         end
 
         return TagFunc
