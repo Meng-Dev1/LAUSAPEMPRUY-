@@ -3170,6 +3170,25 @@ function Menghub:Window(GuiConfig)
     end
 
     --// Tag
+    local TagList = Instance.new("Frame")
+    TagList.Name = "TagList"
+    TagList.AnchorPoint = Vector2.new(1, 0.5)
+    TagList.Position = UDim2.new(1, -68, 0.5, 0)
+    TagList.BackgroundTransparency = 1
+    TagList.AutomaticSize = Enum.AutomaticSize.X
+    TagList.Size = UDim2.new(0, 0, 1, 0)
+    TagList.Parent = Top
+
+    local TagListLayout = Instance.new("UIListLayout")
+    TagListLayout.FillDirection = Enum.FillDirection.Horizontal
+    TagListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    TagListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
+    TagListLayout.Padding = UDim.new(0, 4)
+    TagListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    TagListLayout.Parent = TagList
+
+    local TagCount = 0
+
     function Tabs:Tag(TagConfig)
         TagConfig = TagConfig or {}
         TagConfig.Title  = TagConfig.Title  or "Tag"
@@ -3177,19 +3196,16 @@ function Menghub:Window(GuiConfig)
         TagConfig.Color  = TagConfig.Color  or Color3.fromRGB(255, 255, 255)
         TagConfig.Radius = math.clamp(TagConfig.Radius or 13, 0, 13)
 
-        -- Container tag (di dalam Top bar, sebelah kiri tombol Min)
         local TagFrame = Instance.new("Frame")
         TagFrame.Name = "TagFrame"
-        TagFrame.AnchorPoint = Vector2.new(1, 0.5)
-        TagFrame.Position = UDim2.new(1, -70, 0.5, 0)
         TagFrame.BackgroundColor3 = TagConfig.Color
         TagFrame.BackgroundTransparency = 0.15
         TagFrame.BorderSizePixel = 0
         TagFrame.AutomaticSize = Enum.AutomaticSize.X
         TagFrame.Size = UDim2.new(0, 0, 0, 22)
-        TagFrame.ClipsDescendants = false
+        TagFrame.LayoutOrder = TagCount
         TagFrame.ZIndex = 5
-        TagFrame.Parent = Top
+        TagFrame.Parent = TagList
 
         local TagCorner = Instance.new("UICorner")
         TagCorner.CornerRadius = UDim.new(0, TagConfig.Radius)
@@ -3207,15 +3223,14 @@ function Menghub:Window(GuiConfig)
         TagPadding.PaddingRight = UDim.new(0, 8)
         TagPadding.Parent = TagFrame
 
-        local TagLayout = Instance.new("UIListLayout")
-        TagLayout.FillDirection = Enum.FillDirection.Horizontal
-        TagLayout.VerticalAlignment = Enum.VerticalAlignment.Center
-        TagLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-        TagLayout.Padding = UDim.new(0, 5)
-        TagLayout.SortOrder = Enum.SortOrder.LayoutOrder
-        TagLayout.Parent = TagFrame
+        local TagInnerLayout = Instance.new("UIListLayout")
+        TagInnerLayout.FillDirection = Enum.FillDirection.Horizontal
+        TagInnerLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+        TagInnerLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+        TagInnerLayout.Padding = UDim.new(0, 5)
+        TagInnerLayout.SortOrder = Enum.SortOrder.LayoutOrder
+        TagInnerLayout.Parent = TagFrame
 
-        -- Icon (opsional)
         if TagConfig.Icon ~= "" then
             local iconImg = Instance.new("ImageLabel")
             iconImg.Name = "TagIcon"
@@ -3233,7 +3248,6 @@ function Menghub:Window(GuiConfig)
             iconImg.Parent = TagFrame
         end
 
-        -- Label teks
         local TagLabel = Instance.new("TextLabel")
         TagLabel.Name = "TagLabel"
         TagLabel.BackgroundTransparency = 1
@@ -3246,6 +3260,8 @@ function Menghub:Window(GuiConfig)
         TagLabel.ZIndex = 6
         TagLabel.LayoutOrder = 1
         TagLabel.Parent = TagFrame
+
+        TagCount = TagCount + 1
 
         local TagFunc = {}
         function TagFunc:Set(newTitle, newColor)
