@@ -2107,44 +2107,45 @@ function Menghub:Window(GuiConfig)
             function Items:AddToggle(ToggleConfig)
                 local ToggleConfig = ToggleConfig or {}
                 ToggleConfig.Title = ToggleConfig.Title or "Title"
-                ToggleConfig.Title2 = ToggleConfig.Title2 or ""
                 ToggleConfig.Content = ToggleConfig.Content or ""
                 ToggleConfig.Default = ToggleConfig.Default or false
                 ToggleConfig.Callback = ToggleConfig.Callback or function() end
                 ToggleConfig.Keybind = ToggleConfig.Keybind or false
+                ToggleConfig.KeybindDefault = ToggleConfig.KeybindDefault or "None"
 
                 local configKey = "Toggle_" .. ToggleConfig.Title
+                local keybindKey = "Keybind_" .. ToggleConfig.Title
+
+                -- Sync awal dengan ConfigData
                 if ConfigData[configKey] ~= nil then
                     ToggleConfig.Default = ConfigData[configKey]
                 end
 
-                local ToggleFunc = { Value = ToggleConfig.Default }
+                local ToggleFunc = { Value = ToggleConfig.Default, Type = "Toggle" }
+                local KeybindFunc = { Value = "Keybind", Type = "Keybind" }
                 local isInCallback = false
                 local isListening = false
 
-                --// Elements
+                --// Elements UI
                 local Toggle = Instance.new("Frame")
                 local UICorner20 = Instance.new("UICorner")
                 local ToggleTitle = Instance.new("TextLabel")
-                local ToggleTitle2 = Instance.new("TextLabel")
                 local ToggleContent = Instance.new("TextLabel")
                 local ToggleButton = Instance.new("TextButton")
-
-                --// Right Side Container
                 local RightSide = Instance.new("Frame")
                 local UIListRight = Instance.new("UIListLayout")
-
                 local FeatureFrame2 = Instance.new("Frame")
                 local UICorner22 = Instance.new("UICorner")
                 local UIStroke8 = Instance.new("UIStroke")
                 local ToggleCircle = Instance.new("Frame")
 
+                --// Parent & Base Setup
+                Toggle.Name = "Toggle_" .. ToggleConfig.Title
+                Toggle.Parent = SectionAdd
                 Toggle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                 Toggle.BackgroundTransparency = 0.935
                 Toggle.BorderSizePixel = 0
                 Toggle.LayoutOrder = CountItem
-                Toggle.Name = "Toggle"
-                Toggle.Parent = SectionAdd
 
                 UICorner20.CornerRadius = UDim.new(0, 4)
                 UICorner20.Parent = Toggle
@@ -2163,10 +2164,10 @@ function Menghub:Window(GuiConfig)
                 UIListRight.VerticalAlignment = Enum.VerticalAlignment.Center
                 UIListRight.Padding = UDim.new(0, 8)
 
-                --// KEYBIND BOX (Order 1 = Kiri)
+                --// KEYBIND LOGIC
                 if ToggleConfig.Keybind then
-                    local keybindKey = "Keybind_" .. ToggleConfig.Title
-                    local currentKey = ConfigData[keybindKey] or "None"
+                    local currentKey = ConfigData[keybindKey] or ToggleConfig.KeybindDefault
+                    ConfigData[keybindKey] = currentKey
 
                     local KeyBox = Instance.new("TextButton")
                     local KeyLabel = Instance.new("TextLabel")
@@ -2177,11 +2178,10 @@ function Menghub:Window(GuiConfig)
                     KeyBox.AutoButtonColor = false
                     KeyBox.BackgroundTransparency = 0.95
                     KeyBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                    KeyBox.Size = UDim2.new(0, 75, 0, 20) -- Diperlebar sedikit buat teks combo
+                    KeyBox.Size = UDim2.new(0, 75, 0, 20)
                     KeyBox.LayoutOrder = 1
                     KeyBox.ZIndex = 25
                     KeyBox.Parent = RightSide
-
                     Instance.new("UICorner", KeyBox).CornerRadius = UDim.new(0, 4)
 
                     KeyStroke.Color = Color3.fromRGB(255, 255, 255)
@@ -2190,13 +2190,23 @@ function Menghub:Window(GuiConfig)
                     KeyStroke.Parent = KeyBox
 
                     KeyLabel.Font = Enum.Font.Gotham
-                    KeyLabel.Text = "[" .. currentKey .. "]"
                     KeyLabel.TextSize = 10
                     KeyLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
                     KeyLabel.BackgroundTransparency = 1
                     KeyLabel.Size = UDim2.new(1, 0, 1, 0)
                     KeyLabel.ZIndex = 26
                     KeyLabel.Parent = KeyBox
+
+                    -- Fungsi Set untuk Keybind (Daftarin ke Elements)
+                    function KeybindFunc:Set(val)
+                        val = val or "None"
+                        ConfigData[keybindKey] = val
+                        KeyLabel.Text = "[" .. tostring(val) .. "]"
+                        KeyLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+                    end
+
+                    Elements[keybindKey] = KeybindFunc
+                    KeybindFunc:Set(currentKey)
 
                     local MODIFIERS = {
                         ["LeftControl"] = "LCtrl", ["RightControl"] = "RCtrl",
@@ -2214,29 +2224,24 @@ function Menghub:Window(GuiConfig)
                         local connection
                         connection = UserInputService.InputBegan:Connect(function(inp)
                             if inp.UserInputType ~= Enum.UserInputType.Keyboard then return end
-                            local rawKey = tostring(inp.KeyCode):gsub("Enum.KeyCode.", "")
+                            local rawKey = tostring(inp.KeyCode.Name)
 
-                            -- Jika menekan Modifier, simpan tapi jangan tutup dulu
                             if MODIFIERS[rawKey] then
                                 heldMod = MODIFIERS[rawKey]
                                 KeyLabel.Text = heldMod .. " + ?"
                                 return
                             end
 
-                            -- Jika menekan Key biasa (setelah atau tanpa modifier)
                             connection:Disconnect()
                             local finalKey = (heldMod and (heldMod .. "+" .. rawKey)) or rawKey
-                            if rawKey == "Escape" then finalKey = "None" end
+                            if rawKey == "Escape" or rawKey == "Unknown" then finalKey = "None" end
 
-                            ConfigData[keybindKey] = finalKey
-                            KeyLabel.Text = "[" .. finalKey .. "]"
-                            KeyLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+                            KeybindFunc:Set(finalKey)
                             task.wait(0.1)
                             isListening = false
                         end)
                     end)
 
-                    -- Trigger Keybind Logic
                     UserInputService.InputBegan:Connect(function(input, gpe)
                         if gpe or isListening then return end
                         local saved = ConfigData[keybindKey]
@@ -2245,15 +2250,12 @@ function Menghub:Window(GuiConfig)
                         local modPart, keyPart = saved:match("^(.-)%+(.+)$")
                         if not keyPart then keyPart = saved end
 
-                        local pressedKey = tostring(input.KeyCode):gsub("Enum.KeyCode.", "")
-                        if pressedKey == keyPart then
-                            -- Cek apakah modifier (jika ada) sedang ditekan
+                        if input.KeyCode.Name == keyPart then
                             local modMatch = true
                             if modPart then
                                 local isCtrl = (modPart:find("Ctrl") and (UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)))
                                 local isAlt = (modPart:find("Alt") and (UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) or UserInputService:IsKeyDown(Enum.KeyCode.RightAlt)))
                                 local isShift = (modPart:find("Shift") and (UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)))
-                                
                                 if not (isCtrl or isAlt or isShift) then modMatch = false end
                             end
 
@@ -2264,7 +2266,7 @@ function Menghub:Window(GuiConfig)
                     end)
                 end
 
-                --// TOGGLE VISUAL (Order 2 = Kanan)
+                --// TOGGLE VISUAL
                 FeatureFrame2.Name = "ToggleVisual"
                 FeatureFrame2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                 FeatureFrame2.BackgroundTransparency = 0.92
@@ -2286,7 +2288,7 @@ function Menghub:Window(GuiConfig)
                 ToggleCircle.Parent = FeatureFrame2
                 Instance.new("UICorner", ToggleCircle).CornerRadius = UDim.new(1, 0)
 
-                --// Text Labels
+                --// TEXT LABELS
                 ToggleTitle.Font = Enum.Font.GothamBold
                 ToggleTitle.Text = ToggleConfig.Title
                 ToggleTitle.TextSize = 13
@@ -2294,7 +2296,7 @@ function Menghub:Window(GuiConfig)
                 ToggleTitle.TextXAlignment = Enum.TextXAlignment.Left
                 ToggleTitle.TextYAlignment = Enum.TextYAlignment.Top
                 ToggleTitle.BackgroundTransparency = 1
-                ToggleTitle.Position = UDim2.new(0, 10, 0, 8) -- Diturunin dikit dari atas (8px)
+                ToggleTitle.Position = UDim2.new(0, 10, 0, 8)
                 ToggleTitle.Size = UDim2.new(1, -160, 0, 13)
                 ToggleTitle.Parent = Toggle
 
@@ -2306,7 +2308,7 @@ function Menghub:Window(GuiConfig)
                 ToggleContent.TextXAlignment = Enum.TextXAlignment.Left
                 ToggleContent.TextYAlignment = Enum.TextYAlignment.Top
                 ToggleContent.BackgroundTransparency = 1
-                ToggleContent.Position = UDim2.new(0, 10, 0, 24) -- PENTING: Kasih jarak di bawah judul
+                ToggleContent.Position = UDim2.new(0, 10, 0, 24)
                 ToggleContent.Size = UDim2.new(1, -160, 0, 12)
                 ToggleContent.TextWrapped = true
                 ToggleContent.Parent = Toggle
@@ -2314,12 +2316,12 @@ function Menghub:Window(GuiConfig)
                 local function UpdateHeight()
                     local contentHeight = ToggleContent.TextBounds.Y
                     Toggle.Size = UDim2.new(1, 0, 0, contentHeight + 35)
-                    UpdateSizeSection()
+                    if UpdateSizeSection then UpdateSizeSection() end
                 end
                 ToggleContent:GetPropertyChangedSignal("TextBounds"):Connect(UpdateHeight)
                 UpdateHeight()
 
-                --// Main Button Overlay
+                --// MAIN BUTTON OVERLAY
                 ToggleButton.BackgroundTransparency = 1
                 ToggleButton.Size = UDim2.new(1, 0, 1, 0)
                 ToggleButton.ZIndex = 5
@@ -2332,6 +2334,7 @@ function Menghub:Window(GuiConfig)
                     end
                 end)
 
+                --// TOGGLE FUNC SET
                 function ToggleFunc:Set(Value)
                     ToggleFunc.Value = Value
                     ConfigData[configKey] = Value
@@ -2358,10 +2361,11 @@ function Menghub:Window(GuiConfig)
                     end
                 end
 
+                -- Finalize
                 ToggleFunc:Set(ToggleFunc.Value)
                 CountItem = CountItem + 1
-                ToggleFunc.Type = "Toggle"
                 Elements[configKey] = ToggleFunc
+                
                 return ToggleFunc
             end
 
@@ -3033,175 +3037,6 @@ function Menghub:Window(GuiConfig)
                 DropdownFunc.Type = "Dropdown"
                 Elements[configKey] = DropdownFunc
                 return DropdownFunc
-            end
-
-            function Items:AddKeybind(KeybindConfig)
-                KeybindConfig = KeybindConfig or {}
-                KeybindConfig.Title   = KeybindConfig.Title   or "Keybind"
-                KeybindConfig.Content = KeybindConfig.Content or ""
-                KeybindConfig.Default = KeybindConfig.Default or "None"
-                KeybindConfig.Callback = KeybindConfig.Callback or function() end
-
-                local configKey = "Keybind_" .. KeybindConfig.Title
-                if ConfigData[configKey] ~= nil then
-                    KeybindConfig.Default = ConfigData[configKey]
-                end
-
-                local KeybindFunc = { Value = KeybindConfig.Default }
-                local isListening = false
-
-                local Keybind = Instance.new("Frame")
-                Keybind.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                Keybind.BackgroundTransparency = 0.935
-                Keybind.BorderSizePixel = 0
-                Keybind.LayoutOrder = CountItem
-                Keybind.Size = UDim2.new(1, 0, 0, 46)
-                Keybind.Name = "Keybind"
-                Keybind.Parent = SectionAdd
-
-                local UICornerKB = Instance.new("UICorner")
-                UICornerKB.CornerRadius = UDim.new(0, 4)
-                UICornerKB.Parent = Keybind
-
-                local KeybindTitle = Instance.new("TextLabel")
-                KeybindTitle.Font = Enum.Font.GothamBold
-                KeybindTitle.Text = KeybindConfig.Title
-                KeybindTitle.TextSize = 13
-                KeybindTitle.TextColor3 = Color3.fromRGB(231, 231, 231)
-                KeybindTitle.TextXAlignment = Enum.TextXAlignment.Left
-                KeybindTitle.TextYAlignment = Enum.TextYAlignment.Top
-                KeybindTitle.BackgroundTransparency = 1
-                KeybindTitle.Position = UDim2.new(0, 10, 0, 10)
-                KeybindTitle.Size = UDim2.new(1, -120, 0, 13)
-                KeybindTitle.Name = "KeybindTitle"
-                KeybindTitle.Parent = Keybind
-
-                local KeybindContent = Instance.new("TextLabel")
-                KeybindContent.Font = Enum.Font.GothamBold
-                KeybindContent.Text = KeybindConfig.Content
-                KeybindContent.TextColor3 = Color3.fromRGB(255, 255, 255)
-                KeybindContent.TextSize = 12
-                KeybindContent.TextTransparency = 0.6
-                KeybindContent.TextXAlignment = Enum.TextXAlignment.Left
-                KeybindContent.BackgroundTransparency = 1
-                KeybindContent.Position = UDim2.new(0, 10, 0, 26)
-                KeybindContent.Size = UDim2.new(1, -120, 0, 12)
-                KeybindContent.Name = "KeybindContent"
-                KeybindContent.Parent = Keybind
-
-                local KeyBox = Instance.new("Frame")
-                KeyBox.AnchorPoint = Vector2.new(1, 0.5)
-                KeyBox.BackgroundTransparency = 0.92
-                KeyBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-                KeyBox.BorderSizePixel = 0
-                KeyBox.Position = UDim2.new(1, -10, 0.5, 0)
-                KeyBox.Size = UDim2.new(0, 90, 0, 26)
-                KeyBox.Name = "KeyBox"
-                KeyBox.Parent = Keybind
-
-                local UICornerBox = Instance.new("UICorner")
-                UICornerBox.CornerRadius = UDim.new(0, 4)
-                UICornerBox.Parent = KeyBox
-
-                local UIStrokeBox = Instance.new("UIStroke")
-                UIStrokeBox.Color = Color3.fromRGB(255, 255, 255)
-                UIStrokeBox.Thickness = 1.5
-                UIStrokeBox.Transparency = 0.85
-                UIStrokeBox.Parent = KeyBox
-
-                local KeyLabel = Instance.new("TextLabel")
-                KeyLabel.Font = Enum.Font.GothamBold
-                KeyLabel.Text = KeybindFunc.Value
-                KeyLabel.TextSize = 12
-                KeyLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
-                KeyLabel.TextXAlignment = Enum.TextXAlignment.Center
-                KeyLabel.BackgroundTransparency = 1
-                KeyLabel.Size = UDim2.new(1, 0, 1, 0)
-                KeyLabel.Name = "KeyLabel"
-                KeyLabel.Parent = KeyBox
-
-                local KeybindButton = Instance.new("TextButton")
-                KeybindButton.Text = ""
-                KeybindButton.BackgroundTransparency = 1
-                KeybindButton.Size = UDim2.new(1, 0, 1, 0)
-                KeybindButton.Name = "KeybindButton"
-                KeybindButton.Parent = Keybind
-
-                function KeybindFunc:Set(Value)
-                    KeybindFunc.Value = Value or "None"
-                    KeyLabel.Text = KeybindFunc.Value
-                    ConfigData[configKey] = KeybindFunc.Value
-
-                    if KeybindFunc.Value ~= "None" then
-                        TweenService:Create(UIStrokeBox, TweenInfo.new(0.2), { Color = GuiConfig.Color, Transparency = 0 }):Play()
-                        TweenService:Create(KeyLabel, TweenInfo.new(0.2), { TextColor3 = GuiConfig.Color }):Play()
-                    else
-                        TweenService:Create(UIStrokeBox, TweenInfo.new(0.2), { Color = Color3.fromRGB(255, 255, 255), Transparency = 0.85 }):Play()
-                        TweenService:Create(KeyLabel, TweenInfo.new(0.2), { TextColor3 = Color3.fromRGB(220, 220, 220) }):Play()
-                    end
-
-                    if typeof(KeybindConfig.Callback) == "function" then
-                        task.spawn(function()
-                            pcall(KeybindConfig.Callback, KeybindFunc.Value)
-                        end)
-                    end
-                end
-
-                local inputConn
-                KeybindButton.Activated:Connect(function()
-                    if isListening then return end
-                    isListening = true
-
-                    KeyLabel.Text = "..."
-                    TweenService:Create(UIStrokeBox, TweenInfo.new(0.15), { Color = GuiConfig.Color, Transparency = 0.3 }):Play()
-                    TweenService:Create(KeyBox, TweenInfo.new(0.15), { BackgroundTransparency = 0.75 }):Play()
-
-                    inputConn = UserInputService.InputBegan:Connect(function(input, gameProcessed)
-                        local keyName
-
-                        if input.UserInputType == Enum.UserInputType.Keyboard then
-                            keyName = tostring(input.KeyCode):gsub("Enum.KeyCode.", "")
-                        elseif input.UserInputType == Enum.UserInputType.MouseButton1 then
-                            keyName = "MB1"
-                        elseif input.UserInputType == Enum.UserInputType.MouseButton2 then
-                            keyName = "MB2"
-                        end
-
-                        if keyName then
-                            if keyName == "Escape" then
-                                keyName = "None"
-                            end
-
-                            inputConn:Disconnect()
-                            isListening = false
-
-                            TweenService:Create(KeyBox, TweenInfo.new(0.15), { BackgroundTransparency = 0.92 }):Play()
-                            KeybindFunc:Set(keyName)
-                        end
-                    end)
-                end)
-
-                UserInputService.InputBegan:Connect(function(input, gameProcessed)
-                    if gameProcessed or isListening then return end
-                    if input.UserInputType ~= Enum.UserInputType.Keyboard then return end
-                
-                    local pressedKey = tostring(input.KeyCode):gsub("Enum.KeyCode.", "")
-                    if pressedKey == KeybindFunc.Value and KeybindFunc.Value ~= "None" then
-                        local fn = KeybindConfig.OnPress or KeybindConfig.Callback
-                        if typeof(fn) == "function" then
-                            task.spawn(function()
-                                pcall(fn, KeybindFunc.Value)
-                            end)
-                        end
-                    end
-                end)
-
-                KeybindFunc:Set(KeybindFunc.Value)
-
-                CountItem = CountItem + 1
-                KeybindFunc.Type = "Keybind"
-                Elements[configKey] = KeybindFunc
-                return KeybindFunc
             end
 
             function Items:AddDivider()
