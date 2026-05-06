@@ -2294,7 +2294,7 @@ function Menghub:Window(GuiConfig)
                 ToggleTitle.TextXAlignment = Enum.TextXAlignment.Left
                 ToggleTitle.TextYAlignment = Enum.TextYAlignment.Top
                 ToggleTitle.BackgroundTransparency = 1
-                ToggleTitle.Position = UDim2.new(0, 10, 0, 10)
+                ToggleTitle.Position = UDim2.new(0, 10, 0, 8) -- Diturunin dikit dari atas (8px)
                 ToggleTitle.Size = UDim2.new(1, -160, 0, 13)
                 ToggleTitle.Parent = Toggle
 
@@ -2306,6 +2306,7 @@ function Menghub:Window(GuiConfig)
                 ToggleContent.TextXAlignment = Enum.TextXAlignment.Left
                 ToggleContent.TextYAlignment = Enum.TextYAlignment.Top
                 ToggleContent.BackgroundTransparency = 1
+                ToggleContent.Position = UDim2.new(0, 10, 0, 24) -- PENTING: Kasih jarak di bawah judul
                 ToggleContent.Size = UDim2.new(1, -160, 0, 12)
                 ToggleContent.TextWrapped = true
                 ToggleContent.Parent = Toggle
