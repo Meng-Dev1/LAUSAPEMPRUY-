@@ -2111,6 +2111,7 @@ function Menghub:Window(GuiConfig)
                 ToggleConfig.Content = ToggleConfig.Content or ""
                 ToggleConfig.Default = ToggleConfig.Default or false
                 ToggleConfig.Callback = ToggleConfig.Callback or function() end
+                ToggleConfig.Keybind = ToggleConfig.Keybind or false
 
                 local configKey = "Toggle_" .. ToggleConfig.Title
                 if ConfigData[configKey] ~= nil then
@@ -2119,17 +2120,24 @@ function Menghub:Window(GuiConfig)
 
                 local ToggleFunc = { Value = ToggleConfig.Default }
                 local isInCallback = false
+                local isListening = false
 
+                --// Elements
                 local Toggle = Instance.new("Frame")
                 local UICorner20 = Instance.new("UICorner")
                 local ToggleTitle = Instance.new("TextLabel")
+                local ToggleTitle2 = Instance.new("TextLabel")
                 local ToggleContent = Instance.new("TextLabel")
                 local ToggleButton = Instance.new("TextButton")
+
+                --// Right Side Container
+                local RightSide = Instance.new("Frame")
+                local UIListRight = Instance.new("UIListLayout")
+
                 local FeatureFrame2 = Instance.new("Frame")
                 local UICorner22 = Instance.new("UICorner")
                 local UIStroke8 = Instance.new("UIStroke")
                 local ToggleCircle = Instance.new("Frame")
-                local UICorner23 = Instance.new("UICorner")
 
                 Toggle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                 Toggle.BackgroundTransparency = 0.935
@@ -2141,6 +2149,144 @@ function Menghub:Window(GuiConfig)
                 UICorner20.CornerRadius = UDim.new(0, 4)
                 UICorner20.Parent = Toggle
 
+                RightSide.Name = "RightSide"
+                RightSide.Size = UDim2.new(0, 150, 1, 0)
+                RightSide.Position = UDim2.new(1, -12, 0, 0)
+                RightSide.AnchorPoint = Vector2.new(1, 0)
+                RightSide.BackgroundTransparency = 1
+                RightSide.ZIndex = 10
+                RightSide.Parent = Toggle
+
+                UIListRight.Parent = RightSide
+                UIListRight.FillDirection = Enum.FillDirection.Horizontal
+                UIListRight.HorizontalAlignment = Enum.HorizontalAlignment.Right
+                UIListRight.VerticalAlignment = Enum.VerticalAlignment.Center
+                UIListRight.Padding = UDim.new(0, 8)
+
+                --// KEYBIND BOX (Order 1 = Kiri)
+                if ToggleConfig.Keybind then
+                    local keybindKey = "Keybind_" .. ToggleConfig.Title
+                    local currentKey = ConfigData[keybindKey] or "None"
+
+                    local KeyBox = Instance.new("TextButton")
+                    local KeyLabel = Instance.new("TextLabel")
+                    local KeyStroke = Instance.new("UIStroke")
+
+                    KeyBox.Name = "KeyBox"
+                    KeyBox.Text = ""
+                    KeyBox.AutoButtonColor = false
+                    KeyBox.BackgroundTransparency = 0.95
+                    KeyBox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    KeyBox.Size = UDim2.new(0, 75, 0, 20) -- Diperlebar sedikit buat teks combo
+                    KeyBox.LayoutOrder = 1
+                    KeyBox.ZIndex = 25
+                    KeyBox.Parent = RightSide
+
+                    Instance.new("UICorner", KeyBox).CornerRadius = UDim.new(0, 4)
+
+                    KeyStroke.Color = Color3.fromRGB(255, 255, 255)
+                    KeyStroke.Thickness = 1
+                    KeyStroke.Transparency = 0.8
+                    KeyStroke.Parent = KeyBox
+
+                    KeyLabel.Font = Enum.Font.Gotham
+                    KeyLabel.Text = "[" .. currentKey .. "]"
+                    KeyLabel.TextSize = 10
+                    KeyLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+                    KeyLabel.BackgroundTransparency = 1
+                    KeyLabel.Size = UDim2.new(1, 0, 1, 0)
+                    KeyLabel.ZIndex = 26
+                    KeyLabel.Parent = KeyBox
+
+                    local MODIFIERS = {
+                        ["LeftControl"] = "LCtrl", ["RightControl"] = "RCtrl",
+                        ["LeftAlt"] = "LAlt", ["RightAlt"] = "RAlt",
+                        ["LeftShift"] = "LShift", ["RightShift"] = "RShift"
+                    }
+
+                    KeyBox.MouseButton1Click:Connect(function()
+                        if isListening then return end
+                        isListening = true
+                        KeyLabel.Text = "..."
+                        KeyLabel.TextColor3 = GuiConfig.Color
+
+                        local heldMod = nil
+                        local connection
+                        connection = UserInputService.InputBegan:Connect(function(inp)
+                            if inp.UserInputType ~= Enum.UserInputType.Keyboard then return end
+                            local rawKey = tostring(inp.KeyCode):gsub("Enum.KeyCode.", "")
+
+                            -- Jika menekan Modifier, simpan tapi jangan tutup dulu
+                            if MODIFIERS[rawKey] then
+                                heldMod = MODIFIERS[rawKey]
+                                KeyLabel.Text = heldMod .. " + ?"
+                                return
+                            end
+
+                            -- Jika menekan Key biasa (setelah atau tanpa modifier)
+                            connection:Disconnect()
+                            local finalKey = (heldMod and (heldMod .. "+" .. rawKey)) or rawKey
+                            if rawKey == "Escape" then finalKey = "None" end
+
+                            ConfigData[keybindKey] = finalKey
+                            KeyLabel.Text = "[" .. finalKey .. "]"
+                            KeyLabel.TextColor3 = Color3.fromRGB(180, 180, 180)
+                            task.wait(0.1)
+                            isListening = false
+                        end)
+                    end)
+
+                    -- Trigger Keybind Logic
+                    UserInputService.InputBegan:Connect(function(input, gpe)
+                        if gpe or isListening then return end
+                        local saved = ConfigData[keybindKey]
+                        if not saved or saved == "None" then return end
+
+                        local modPart, keyPart = saved:match("^(.-)%+(.+)$")
+                        if not keyPart then keyPart = saved end
+
+                        local pressedKey = tostring(input.KeyCode):gsub("Enum.KeyCode.", "")
+                        if pressedKey == keyPart then
+                            -- Cek apakah modifier (jika ada) sedang ditekan
+                            local modMatch = true
+                            if modPart then
+                                local isCtrl = (modPart:find("Ctrl") and (UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) or UserInputService:IsKeyDown(Enum.KeyCode.RightControl)))
+                                local isAlt = (modPart:find("Alt") and (UserInputService:IsKeyDown(Enum.KeyCode.LeftAlt) or UserInputService:IsKeyDown(Enum.KeyCode.RightAlt)))
+                                local isShift = (modPart:find("Shift") and (UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) or UserInputService:IsKeyDown(Enum.KeyCode.RightShift)))
+                                
+                                if not (isCtrl or isAlt or isShift) then modMatch = false end
+                            end
+
+                            if modMatch then
+                                ToggleFunc:Set(not ToggleFunc.Value)
+                            end
+                        end
+                    end)
+                end
+
+                --// TOGGLE VISUAL (Order 2 = Kanan)
+                FeatureFrame2.Name = "ToggleVisual"
+                FeatureFrame2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                FeatureFrame2.BackgroundTransparency = 0.92
+                FeatureFrame2.Size = UDim2.new(0, 30, 0, 15)
+                FeatureFrame2.LayoutOrder = 2
+                FeatureFrame2.Parent = RightSide
+
+                UICorner22.CornerRadius = UDim.new(0, 10)
+                UICorner22.Parent = FeatureFrame2
+
+                UIStroke8.Color = Color3.fromRGB(255, 255, 255)
+                UIStroke8.Thickness = 1.5
+                UIStroke8.Transparency = 0.9
+                UIStroke8.Parent = FeatureFrame2
+
+                ToggleCircle.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
+                ToggleCircle.Size = UDim2.new(0, 12, 0, 12)
+                ToggleCircle.Position = UDim2.new(0, 2, 0.5, -6)
+                ToggleCircle.Parent = FeatureFrame2
+                Instance.new("UICorner", ToggleCircle).CornerRadius = UDim.new(1, 0)
+
+                --// Text Labels
                 ToggleTitle.Font = Enum.Font.GothamBold
                 ToggleTitle.Text = ToggleConfig.Title
                 ToggleTitle.TextSize = 13
@@ -2149,22 +2295,8 @@ function Menghub:Window(GuiConfig)
                 ToggleTitle.TextYAlignment = Enum.TextYAlignment.Top
                 ToggleTitle.BackgroundTransparency = 1
                 ToggleTitle.Position = UDim2.new(0, 10, 0, 10)
-                ToggleTitle.Size = UDim2.new(1, -100, 0, 13)
-                ToggleTitle.Name = "ToggleTitle"
+                ToggleTitle.Size = UDim2.new(1, -160, 0, 13)
                 ToggleTitle.Parent = Toggle
-
-                local ToggleTitle2 = Instance.new("TextLabel")
-                ToggleTitle2.Font = Enum.Font.GothamBold
-                ToggleTitle2.Text = ToggleConfig.Title2
-                ToggleTitle2.TextSize = 12
-                ToggleTitle2.TextColor3 = Color3.fromRGB(231, 231, 231)
-                ToggleTitle2.TextXAlignment = Enum.TextXAlignment.Left
-                ToggleTitle2.TextYAlignment = Enum.TextYAlignment.Top
-                ToggleTitle2.BackgroundTransparency = 1
-                ToggleTitle2.Position = UDim2.new(0, 10, 0, 23)
-                ToggleTitle2.Size = UDim2.new(1, -100, 0, 12)
-                ToggleTitle2.Name = "ToggleTitle2"
-                ToggleTitle2.Parent = Toggle
 
                 ToggleContent.Font = Enum.Font.GothamBold
                 ToggleContent.Text = ToggleConfig.Content
@@ -2172,78 +2304,31 @@ function Menghub:Window(GuiConfig)
                 ToggleContent.TextSize = 12
                 ToggleContent.TextTransparency = 0.6
                 ToggleContent.TextXAlignment = Enum.TextXAlignment.Left
-                ToggleContent.TextYAlignment = Enum.TextYAlignment.Bottom
+                ToggleContent.TextYAlignment = Enum.TextYAlignment.Top
                 ToggleContent.BackgroundTransparency = 1
-                ToggleContent.Size = UDim2.new(1, -100, 0, 12)
-                ToggleContent.Name = "ToggleContent"
+                ToggleContent.Size = UDim2.new(1, -160, 0, 12)
+                ToggleContent.TextWrapped = true
                 ToggleContent.Parent = Toggle
 
-                if ToggleConfig.Title2 ~= "" then
-                    Toggle.Size = UDim2.new(1, 0, 0, 57)
-                    ToggleContent.Position = UDim2.new(0, 10, 0, 36)
-                    ToggleTitle2.Visible = true
-                else
-                    Toggle.Size = UDim2.new(1, 0, 0, 46)
-                    ToggleContent.Position = UDim2.new(0, 10, 0, 23)
-                    ToggleTitle2.Visible = false
-                end
-
-                ToggleContent.Size = UDim2.new(1, -100, 0,
-                    12 + (12 * (ToggleContent.TextBounds.X // ToggleContent.AbsoluteSize.X)))
-                ToggleContent.TextWrapped = true
-                if ToggleConfig.Title2 ~= "" then
-                    Toggle.Size = UDim2.new(1, 0, 0, ToggleContent.AbsoluteSize.Y + 47)
-                else
-                    Toggle.Size = UDim2.new(1, 0, 0, ToggleContent.AbsoluteSize.Y + 33)
-                end
-
-                ToggleContent:GetPropertyChangedSignal("AbsoluteSize"):Connect(function()
-                    ToggleContent.TextWrapped = false
-                    ToggleContent.Size = UDim2.new(1, -100, 0,
-                        12 + (12 * (ToggleContent.TextBounds.X // ToggleContent.AbsoluteSize.X)))
-                    if ToggleConfig.Title2 ~= "" then
-                        Toggle.Size = UDim2.new(1, 0, 0, ToggleContent.AbsoluteSize.Y + 47)
-                    else
-                        Toggle.Size = UDim2.new(1, 0, 0, ToggleContent.AbsoluteSize.Y + 33)
-                    end
-                    ToggleContent.TextWrapped = true
+                local function UpdateHeight()
+                    local contentHeight = ToggleContent.TextBounds.Y
+                    Toggle.Size = UDim2.new(1, 0, 0, contentHeight + 35)
                     UpdateSizeSection()
-                end)
+                end
+                ToggleContent:GetPropertyChangedSignal("TextBounds"):Connect(UpdateHeight)
+                UpdateHeight()
 
-                ToggleButton.Font = Enum.Font.SourceSans
-                ToggleButton.Text = ""
+                --// Main Button Overlay
                 ToggleButton.BackgroundTransparency = 1
                 ToggleButton.Size = UDim2.new(1, 0, 1, 0)
-                ToggleButton.Name = "ToggleButton"
+                ToggleButton.ZIndex = 5
+                ToggleButton.Text = ""
                 ToggleButton.Parent = Toggle
 
-                FeatureFrame2.AnchorPoint = Vector2.new(1, 0.5)
-                FeatureFrame2.BackgroundTransparency = 0.92
-                FeatureFrame2.BorderSizePixel = 0
-                FeatureFrame2.Position = UDim2.new(1, -15, 0.5, 0)
-                FeatureFrame2.Size = UDim2.new(0, 30, 0, 15)
-                FeatureFrame2.Name = "FeatureFrame"
-                FeatureFrame2.Parent = Toggle
-
-                UICorner22.Parent = FeatureFrame2
-
-                UIStroke8.Color = Color3.fromRGB(255, 255, 255)
-                UIStroke8.Thickness = 2
-                UIStroke8.Transparency = 0.9
-                UIStroke8.Parent = FeatureFrame2
-
-                ToggleCircle.BackgroundColor3 = Color3.fromRGB(230, 230, 230)
-                ToggleCircle.BorderSizePixel = 0
-                ToggleCircle.Size = UDim2.new(0, 14, 0, 14)
-                ToggleCircle.Name = "ToggleCircle"
-                ToggleCircle.Parent = FeatureFrame2
-
-                UICorner23.CornerRadius = UDim.new(0, 15)
-                UICorner23.Parent = ToggleCircle
-
                 ToggleButton.Activated:Connect(function()
-                    ToggleFunc.Value = not ToggleFunc.Value
-                    ToggleFunc:Set(ToggleFunc.Value)
+                    if not isListening then
+                        ToggleFunc:Set(not ToggleFunc.Value)
+                    end
                 end)
 
                 function ToggleFunc:Set(Value)
@@ -2252,25 +2337,20 @@ function Menghub:Window(GuiConfig)
 
                     if Value then
                         TweenService:Create(ToggleTitle, TweenInfo.new(0.2), { TextColor3 = GuiConfig.Color }):Play()
-                        TweenService:Create(ToggleCircle, TweenInfo.new(0.2), { Position = UDim2.new(0, 15, 0, 0) }):Play()
-                        TweenService:Create(UIStroke8, TweenInfo.new(0.2), { Color = GuiConfig.Color, Transparency = 0 }):Play()
+                        TweenService:Create(ToggleCircle, TweenInfo.new(0.2), { Position = UDim2.new(1, -14, 0.5, -6) }):Play()
                         TweenService:Create(FeatureFrame2, TweenInfo.new(0.2), { BackgroundColor3 = GuiConfig.Color, BackgroundTransparency = 0 }):Play()
+                        TweenService:Create(UIStroke8, TweenInfo.new(0.2), { Transparency = 1 }):Play()
                     else
-                        TweenService:Create(ToggleTitle, TweenInfo.new(0.2), { TextColor3 = Color3.fromRGB(230, 230, 230) }):Play()
-                        TweenService:Create(ToggleCircle, TweenInfo.new(0.2), { Position = UDim2.new(0, 0, 0, 0) }):Play()
-                        TweenService:Create(UIStroke8, TweenInfo.new(0.2), { Color = Color3.fromRGB(255, 255, 255), Transparency = 0.9 }):Play()
+                        TweenService:Create(ToggleTitle, TweenInfo.new(0.2), { TextColor3 = Color3.fromRGB(231, 231, 231) }):Play()
+                        TweenService:Create(ToggleCircle, TweenInfo.new(0.2), { Position = UDim2.new(0, 2, 0.5, -6) }):Play()
                         TweenService:Create(FeatureFrame2, TweenInfo.new(0.2), { BackgroundColor3 = Color3.fromRGB(255, 255, 255), BackgroundTransparency = 0.92 }):Play()
+                        TweenService:Create(UIStroke8, TweenInfo.new(0.2), { Transparency = 0.9 }):Play()
                     end
 
                     if not isInCallback then
                         isInCallback = true
                         task.spawn(function()
-                            if typeof(ToggleConfig.Callback) == "function" then
-                                local ok, err = pcall(function()
-                                    ToggleConfig.Callback(Value)
-                                end)
-                                if not ok then warn("Toggle Callback error:", err) end
-                            end
+                            pcall(ToggleConfig.Callback, Value)
                             task.wait(0.05)
                             isInCallback = false
                         end)
