@@ -2790,10 +2790,12 @@ function Menghub:Window(GuiConfig)
                 end
 
                 function DropdownFunc:AddOption(option)
-                    local label, value
+                    local label, value, subLabel, subColor
                     if typeof(option) == "table" and option.Label and option.Value ~= nil then
-                        label = tostring(option.Label)
-                        value = option.Value
+                        label    = tostring(option.Label)
+                        value    = option.Value
+                        subLabel = option.SubLabel
+                        subColor = option.SubColor
                     else
                         label = tostring(option)
                         value = option
@@ -2807,8 +2809,10 @@ function Menghub:Window(GuiConfig)
                     local UICorner38 = Instance.new("UICorner")
                     local UICorner37 = Instance.new("UICorner")
 
+                    local optionHeight = subLabel and 42 or 30
+
                     Option.BackgroundTransparency = 1
-                    Option.Size = UDim2.new(1, 0, 0, 30)
+                    Option.Size = UDim2.new(1, 0, 0, optionHeight)
                     Option.Name = "Option"
                     Option.Parent = ScrollSelect
 
@@ -2825,12 +2829,26 @@ function Menghub:Window(GuiConfig)
                     OptionText.Text = label
                     OptionText.TextSize = 13
                     OptionText.TextColor3 = Color3.fromRGB(230, 230, 230)
-                    OptionText.Position = UDim2.new(0, 8, 0, 8)
+                    OptionText.Position = UDim2.new(0, 8, 0, subLabel and 6 or 8)
                     OptionText.Size = UDim2.new(1, -100, 0, 13)
                     OptionText.BackgroundTransparency = 1
                     OptionText.TextXAlignment = Enum.TextXAlignment.Left
                     OptionText.Name = "OptionText"
                     OptionText.Parent = Option
+
+                    if subLabel then
+                        local SubText = Instance.new("TextLabel")
+                        SubText.Font = Enum.Font.GothamBold
+                        SubText.Text = tostring(subLabel)
+                        SubText.TextSize = 10
+                        SubText.TextColor3 = subColor or Color3.fromRGB(220, 80, 80)
+                        SubText.Position = UDim2.new(0, 8, 0, 22)
+                        SubText.Size = UDim2.new(1, -20, 0, 12)
+                        SubText.BackgroundTransparency = 1
+                        SubText.TextXAlignment = Enum.TextXAlignment.Left
+                        SubText.Name = "SubText"
+                        SubText.Parent = Option
+                    end
 
                     Option:SetAttribute("RealValue", value)
 
