@@ -2215,6 +2215,11 @@ function Menghub:Window(GuiConfig)
                     }
 
                     KeyBox.MouseButton1Click:Connect(function()
+                        if isMobile then
+                            notif("Only PC can use this Feature")
+                            return
+                        end
+
                         if isListening then return end
                         isListening = true
                         KeyLabel.Text = "..."
@@ -2243,7 +2248,7 @@ function Menghub:Window(GuiConfig)
                     end)
 
                     UserInputService.InputBegan:Connect(function(input, gpe)
-                        if gpe or isListening then return end
+                        if gpe or isListening or isMobile then return end
                         local saved = ConfigData[keybindKey]
                         if not saved or saved == "None" then return end
 
