@@ -322,37 +322,30 @@ function Menghub:MakeNotify(NotifyConfig)
             end)
         end
 
-        -- Calculate stacking position
         local NotifyPosHeight = 0
         for i, v in CoreGui.NotifyGui.NotifyLayout:GetChildren() do
             NotifyPosHeight = -(v.Position.Y.Offset) + v.Size.Y.Offset + 10
         end
 
-        -- === INSTANCES ===
         local NotifyFrame        = Instance.new("Frame")
         local NotifyFrameReal    = Instance.new("Frame")
         local UICorner           = Instance.new("UICorner")
         local UIStroke           = Instance.new("UIStroke")
 
-        -- Icon box (left)
         local IconBox            = Instance.new("Frame")
         local IconBoxCorner      = Instance.new("UICorner")
         local IconImage          = Instance.new("ImageLabel")
 
-        -- Content area
         local ContentFrame       = Instance.new("Frame")
 
-        -- Top row
         local TopRow             = Instance.new("Frame")
         local TitleLabel         = Instance.new("TextLabel")
         local DescLabel          = Instance.new("TextLabel")
         local CloseBtn           = Instance.new("TextButton")
         local CloseIcon          = Instance.new("ImageLabel")
 
-        -- Message text
         local MsgLabel           = Instance.new("TextLabel")
 
-        -- === OUTER WRAPPER (transparent, for stacking) ===
         NotifyFrame.BackgroundTransparency = 1
         NotifyFrame.BorderSizePixel = 0
         NotifyFrame.Size = UDim2.new(1, 0, 0, 64)
@@ -361,10 +354,9 @@ function Menghub:MakeNotify(NotifyConfig)
         NotifyFrame.Position = UDim2.new(0, 0, 1, -NotifyPosHeight)
         NotifyFrame.Parent = CoreGui.NotifyGui.NotifyLayout
 
-        -- === MAIN CARD ===
         NotifyFrameReal.BackgroundColor3 = Color3.fromRGB(26, 27, 32)
         NotifyFrameReal.BorderSizePixel = 0
-        NotifyFrameReal.Position = UDim2.new(0, 400, 0, 0) -- starts off-screen (right)
+        NotifyFrameReal.Position = UDim2.new(0, 400, 0, 0) 
         NotifyFrameReal.Size = UDim2.new(1, 0, 1, 0)
         NotifyFrameReal.Name = "NotifyFrameReal"
         NotifyFrameReal.Parent = NotifyFrame
@@ -378,7 +370,6 @@ function Menghub:MakeNotify(NotifyConfig)
         UIStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
         UIStroke.Parent = NotifyFrameReal
 
-        -- === ICON BOX ===
         IconBox.BackgroundColor3 = Color3.fromRGB(176, 110, 243)
         IconBox.BackgroundTransparency = 0.85
         IconBox.BorderSizePixel = 0
@@ -401,7 +392,6 @@ function Menghub:MakeNotify(NotifyConfig)
         IconImage.ImageColor3 = Color3.fromRGB(176, 110, 243)
         IconImage.Parent = IconBox
 
-        -- === CONTENT FRAME ===
         ContentFrame.BackgroundTransparency = 1
         ContentFrame.BorderSizePixel = 0
         ContentFrame.Position = UDim2.new(0, 54, 0, 0)
@@ -409,7 +399,6 @@ function Menghub:MakeNotify(NotifyConfig)
         ContentFrame.Name = "ContentFrame"
         ContentFrame.Parent = NotifyFrameReal
 
-        -- === TOP ROW ===
         TopRow.BackgroundTransparency = 1
         TopRow.BorderSizePixel = 0
         TopRow.Size = UDim2.new(1, 0, 0, 28)
@@ -438,7 +427,6 @@ function Menghub:MakeNotify(NotifyConfig)
         DescLabel.Position = UDim2.new(0, TitleLabel.TextBounds.X + 6, 0, 0)
         DescLabel.Parent = TopRow
 
-        -- Close button
         CloseBtn.Text = ""
         CloseBtn.AnchorPoint = Vector2.new(1, 0.5)
         CloseBtn.BackgroundTransparency = 1
@@ -455,7 +443,6 @@ function Menghub:MakeNotify(NotifyConfig)
         CloseIcon.Size = UDim2.new(0.65, 0, 0.65, 0)
         CloseIcon.Parent = CloseBtn
 
-        -- === MESSAGE TEXT ===
         MsgLabel.Font = Enum.Font.Gotham
         MsgLabel.Text = NotifyConfig.Content
         MsgLabel.TextColor3 = Color3.fromRGB(160, 160, 175)
@@ -468,14 +455,12 @@ function Menghub:MakeNotify(NotifyConfig)
         MsgLabel.Size = UDim2.new(1, 0, 0, 14)
         MsgLabel.Parent = ContentFrame
 
-        -- Auto-size height
         MsgLabel.Size = UDim2.new(1, 0, 0, 14 + (14 * (MsgLabel.TextBounds.X // MsgLabel.AbsoluteSize.X)))
 
-        local totalHeight = MsgLabel.AbsoluteSize.Y + 28 + 16 -- top padding + msg + bottom padding
+        local totalHeight = MsgLabel.AbsoluteSize.Y + 28 + 16 
         if totalHeight < 60 then totalHeight = 60 end
         NotifyFrame.Size = UDim2.new(1, 0, 0, totalHeight)
 
-        -- === CLOSE FUNCTION ===
         local waitbruh = false
         function NotifyFunction:Close()
             if waitbruh then return false end
@@ -493,7 +478,6 @@ function Menghub:MakeNotify(NotifyConfig)
             NotifyFunction:Close()
         end)
 
-        -- === SLIDE IN ===
         TweenService:Create(
             NotifyFrameReal,
             TweenInfo.new(tonumber(NotifyConfig.Time), Enum.EasingStyle.Quint, Enum.EasingDirection.Out),
@@ -2212,6 +2196,7 @@ function Menghub:Window(GuiConfig)
                     KeyBox.LayoutOrder = 1
                     KeyBox.ZIndex = 25
                     KeyBox.Parent = RightSide
+                    KeyBox.Visible = not isMobile
                     Instance.new("UICorner", KeyBox).CornerRadius = UDim.new(0, 4)
 
                     KeyStroke.Color = Color3.fromRGB(255, 255, 255)
