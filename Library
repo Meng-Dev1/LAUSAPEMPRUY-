@@ -538,7 +538,6 @@ function Menghub:Window(GuiConfig)
     local LayersFolder = Instance.new("Folder");
     local LayersPageLayout = Instance.new("UIPageLayout");
     local MainStroke = Instance.new("UIStroke");
-    local ThemeImage = Instance.new("ImageLabel");
 
     Menghubb.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
     Menghubb.Name = "MengHubGui"
@@ -620,7 +619,7 @@ function Menghub:Window(GuiConfig)
     TitleIcon.Size = UDim2.new(0, 20, 0, 20)
     TitleIcon.Image = GuiConfig.Icon
 
-    -- // Background Image System (Posisi Mojok & Skala Proporsional kayak Ref)
+    -- // Background Image
     local ImageWrapper = Instance.new("Frame")
     ImageWrapper.Name = "ImageWrapper"
     ImageWrapper.Parent = Main
@@ -634,53 +633,84 @@ function Menghub:Window(GuiConfig)
     ThemeImage.Name = "ThemeImage"
     ThemeImage.Parent = ImageWrapper
     ThemeImage.BackgroundTransparency = 1
-
     ThemeImage.AnchorPoint = Vector2.new(1, 1)
     ThemeImage.Position = UDim2.new(1, 0, 1, 0)
-
     ThemeImage.Size = UDim2.new(0.65, 0, 0.95, 0)
-
     ThemeImage.ZIndex = 1
-    ThemeImage.Image = "rbxassetid://132409051529563"
+    ThemeImage.Image = "rbxassetid://99142076352082"
     ThemeImage.ImageTransparency = 0.15
     ThemeImage.ScaleType = Enum.ScaleType.Crop
 
     local Gradient = Instance.new("UIGradient")
     Gradient.Rotation = 45
     Gradient.Transparency = NumberSequence.new({
-        NumberSequenceKeypoint.new(0, 1),    
+        NumberSequenceKeypoint.new(0, 1),
         NumberSequenceKeypoint.new(0.6, 0.8),
-        NumberSequenceKeypoint.new(1, 0) 
+        NumberSequenceKeypoint.new(1, 0)
     })
     Gradient.Parent = ThemeImage
 
+    -- Title + Footer dalam satu row pakai UIListLayout biar ga pernah dempet
+    local TitleRow = Instance.new("Frame")
+    TitleRow.Name = "TitleRow"
+    TitleRow.BackgroundTransparency = 1
+    TitleRow.BorderSizePixel = 0
+    TitleRow.AnchorPoint = Vector2.new(0, 0.5)
+    TitleRow.Position = UDim2.new(0, 35, 0.5, 0)
+    TitleRow.Size = UDim2.new(1, -145, 0, 20)
+    TitleRow.AutomaticSize = Enum.AutomaticSize.X
+    TitleRow.ClipsDescendants = false
+    TitleRow.Parent = Top
+
+    local TitleRowLayout = Instance.new("UIListLayout")
+    TitleRowLayout.FillDirection = Enum.FillDirection.Horizontal
+    TitleRowLayout.VerticalAlignment = Enum.VerticalAlignment.Center
+    TitleRowLayout.HorizontalAlignment = Enum.HorizontalAlignment.Left
+    TitleRowLayout.Padding = UDim.new(0, 6)
+    TitleRowLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    TitleRowLayout.Parent = TitleRow
+
+    -- Title label
     TextLabel.Font = Enum.Font.GothamBold
     TextLabel.Text = GuiConfig.Title
     TextLabel.TextColor3 = GuiConfig.Color
     TextLabel.TextSize = 14
     TextLabel.TextXAlignment = Enum.TextXAlignment.Left
-    TextLabel.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    TextLabel.BackgroundTransparency = 0.999
-    TextLabel.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    TextLabel.BackgroundTransparency = 1
     TextLabel.BorderSizePixel = 0
-    TextLabel.Size = UDim2.new(1, -135, 1, 0) 
-    TextLabel.Position = UDim2.new(0, 35, 0, 0) 
-    TextLabel.Parent = Top
+    TextLabel.Size = UDim2.new(0, 0, 1, 0)
+    TextLabel.AutomaticSize = Enum.AutomaticSize.X
+    TextLabel.LayoutOrder = 0
+    TextLabel.Parent = TitleRow
 
     UICorner1.Parent = Top
 
-    TextLabel1.Font = Enum.Font.GothamBold
+    -- Separator
+    local TitleSep = Instance.new("TextLabel")
+    TitleSep.Name = "TitleSep"
+    TitleSep.Text = "|"
+    TitleSep.Font = Enum.Font.Gotham
+    TitleSep.TextSize = 12
+    TitleSep.TextColor3 = Color3.fromRGB(120, 100, 150)
+    TitleSep.BackgroundTransparency = 1
+    TitleSep.BorderSizePixel = 0
+    TitleSep.Size = UDim2.new(0, 8, 1, 0)
+    TitleSep.AutomaticSize = Enum.AutomaticSize.X
+    TitleSep.LayoutOrder = 1
+    TitleSep.Parent = TitleRow
+
+    -- Footer label
+    TextLabel1.Font = Enum.Font.Gotham
     TextLabel1.Text = GuiConfig.Footer
-    TextLabel1.TextColor3 = GuiConfig.Color
+    TextLabel1.TextColor3 = Color3.fromRGB(160, 140, 190)
     TextLabel1.TextSize = 12
     TextLabel1.TextXAlignment = Enum.TextXAlignment.Left
-    TextLabel1.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    TextLabel1.BackgroundTransparency = 0.9990000128746033
-    TextLabel1.BorderColor3 = Color3.fromRGB(0, 0, 0)
+    TextLabel1.BackgroundTransparency = 1
     TextLabel1.BorderSizePixel = 0
-    TextLabel1.Size = UDim2.new(1, -(TextLabel.TextBounds.X + 104), 1, 0)
-    TextLabel1.Position = UDim2.new(0, 25 + TextLabel.TextBounds.X + 10, 0, 0)
-    TextLabel1.Parent = Top
+    TextLabel1.Size = UDim2.new(0, 0, 1, 0)
+    TextLabel1.AutomaticSize = Enum.AutomaticSize.X
+    TextLabel1.LayoutOrder = 2
+    TextLabel1.Parent = TitleRow
 
     Close.Font = Enum.Font.SourceSans
     Close.Text = ""
