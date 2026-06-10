@@ -2156,17 +2156,30 @@ function Menghub:Window(GuiConfig)
                 ToggleConfig.Callback = ToggleConfig.Callback or function() end
                 ToggleConfig.Keybind = ToggleConfig.Keybind or false
                 ToggleConfig.KeybindDefault = ToggleConfig.KeybindDefault or "None"
+                ToggleConfig.Colorpicker = ToggleConfig.Colorpicker or false
+                ToggleConfig.ColorDefault = ToggleConfig.ColorDefault or Color3.fromRGB(255, 255, 255)
+                ToggleConfig.ColorCallback = ToggleConfig.ColorCallback or function() end
 
                 local configKey = "Toggle_" .. ToggleConfig.Title
                 local keybindKey = "Keybind_" .. ToggleConfig.Title
+                local colorKey = "Color_" .. ToggleConfig.Title
 
                 -- Sync awal dengan ConfigData
                 if ConfigData[configKey] ~= nil then
                     ToggleConfig.Default = ConfigData[configKey]
                 end
 
+                -- Sync color dari ConfigData (disimpan sebagai {r,g,b})
+                if ConfigData[colorKey] ~= nil then
+                    local c = ConfigData[colorKey]
+                    if type(c) == "table" and c.r and c.g and c.b then
+                        ToggleConfig.ColorDefault = Color3.new(c.r, c.g, c.b)
+                    end
+                end
+
                 local ToggleFunc = { Value = ToggleConfig.Default, Type = "Toggle" }
                 local KeybindFunc = { Value = "Keybind", Type = "Keybind" }
+                local ColorpickerFunc = { Value = ToggleConfig.ColorDefault, Type = "Colorpicker" }
                 local isInCallback = false
                 local isListening = false
 
@@ -2316,6 +2329,377 @@ function Menghub:Window(GuiConfig)
                     end)
                 end
 
+                --// COLORPICKER LOGIC
+                if ToggleConfig.Colorpicker then
+                    local cpColor = ToggleConfig.ColorDefault
+                    local cpOpen = false
+
+                    -- Kotak kecil warna di RightSide
+                    local ColorBox = Instance.new("TextButton")
+                    ColorBox.Name = "ColorBox"
+                    ColorBox.Text = ""
+                    ColorBox.AutoButtonColor = false
+                    ColorBox.BackgroundColor3 = cpColor
+                    ColorBox.Size = UDim2.new(0, 20, 0, 20)
+                    ColorBox.LayoutOrder = 0
+                    ColorBox.ZIndex = 25
+                    ColorBox.Parent = RightSide
+                    local cbCorner = Instance.new("UICorner")
+                    cbCorner.CornerRadius = UDim.new(0, 4)
+                    cbCorner.Parent = ColorBox
+                    local cbStroke = Instance.new("UIStroke")
+                    cbStroke.Color = Color3.fromRGB(255, 255, 255)
+                    cbStroke.Thickness = 1
+                    cbStroke.Transparency = 0.7
+                    cbStroke.Parent = ColorBox
+
+                    -- Popup di-parent ke ScreenGui biar ga kena ClipsDescendants
+                    local cpScreenGui = Instance.new("ScreenGui")
+                    cpScreenGui.Name = "CPGui_" .. ToggleConfig.Title
+                    cpScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+                    cpScreenGui.ResetOnSpawn = false
+                    cpScreenGui.Parent = CoreGui
+
+                    local CPPopup = Instance.new("Frame")
+                    CPPopup.Name = "CPPopup"
+                    CPPopup.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+                    CPPopup.BorderSizePixel = 0
+                    CPPopup.Size = UDim2.new(0, 180, 0, 215)
+                    CPPopup.ZIndex = 200
+                    CPPopup.Visible = false
+                    CPPopup.ClipsDescendants = false
+                    CPPopup.Parent = cpScreenGui
+                    local cpPopCorner = Instance.new("UICorner")
+                    cpPopCorner.CornerRadius = UDim.new(0, 8)
+                    cpPopCorner.Parent = CPPopup
+                    local cpPopStroke = Instance.new("UIStroke")
+                    cpPopStroke.Color = Color3.fromRGB(255, 255, 255)
+                    cpPopStroke.Thickness = 1
+                    cpPopStroke.Transparency = 0.8
+                    cpPopStroke.Parent = CPPopup
+
+                    -- Hue gradient bar (vertikal, kanan) — pure UIGradient, no assets
+                    local HueBar = Instance.new("Frame")
+                    HueBar.Name = "HueBar"
+                    HueBar.BorderSizePixel = 0
+                    HueBar.Position = UDim2.new(0, 155, 0, 10)
+                    HueBar.Size = UDim2.new(0, 14, 0, 140)
+                    HueBar.ZIndex = 201
+                    HueBar.Parent = CPPopup
+                    Instance.new("UICorner", HueBar).CornerRadius = UDim.new(0, 4)
+                    local hueGrad = Instance.new("UIGradient")
+                    hueGrad.Rotation = 90
+                    hueGrad.Color = ColorSequence.new({
+                        ColorSequenceKeypoint.new(0/6,  Color3.fromHSV(0/6,  1, 1)),
+                        ColorSequenceKeypoint.new(1/6,  Color3.fromHSV(1/6,  1, 1)),
+                        ColorSequenceKeypoint.new(2/6,  Color3.fromHSV(2/6,  1, 1)),
+                        ColorSequenceKeypoint.new(3/6,  Color3.fromHSV(3/6,  1, 1)),
+                        ColorSequenceKeypoint.new(4/6,  Color3.fromHSV(4/6,  1, 1)),
+                        ColorSequenceKeypoint.new(5/6,  Color3.fromHSV(5/6,  1, 1)),
+                        ColorSequenceKeypoint.new(1,    Color3.fromHSV(1,    1, 1)),
+                    })
+                    hueGrad.Parent = HueBar
+
+                    local HueCursor = Instance.new("Frame")
+                    HueCursor.Name = "HueCursor"
+                    HueCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    HueCursor.BorderSizePixel = 0
+                    HueCursor.Size = UDim2.new(1, 4, 0, 3)
+                    HueCursor.Position = UDim2.new(0, -2, 0, 0)
+                    HueCursor.ZIndex = 202
+                    HueCursor.Parent = HueBar
+                    Instance.new("UICorner", HueCursor).CornerRadius = UDim.new(0, 2)
+
+                    -- SV picker — pure UIGradient berlapis
+                    -- Layer 1: base hue solid
+                    -- Layer 2: putih→transparan (kiri ke kanan = saturation)
+                    -- Layer 3: transparan→hitam (atas ke bawah = value)
+                    local SVPicker = Instance.new("Frame")
+                    SVPicker.Name = "SVPicker"
+                    SVPicker.BackgroundColor3 = Color3.fromHSV(0, 1, 1)
+                    SVPicker.BorderSizePixel = 0
+                    SVPicker.Position = UDim2.new(0, 10, 0, 10)
+                    SVPicker.Size = UDim2.new(0, 135, 0, 140)
+                    SVPicker.ZIndex = 201
+                    SVPicker.Parent = CPPopup
+                    Instance.new("UICorner", SVPicker).CornerRadius = UDim.new(0, 4)
+
+                    -- Layer saturation (putih kiri → transparan kanan)
+                    local SVSatLayer = Instance.new("Frame")
+                    SVSatLayer.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    SVSatLayer.BorderSizePixel = 0
+                    SVSatLayer.Size = UDim2.new(1, 0, 1, 0)
+                    SVSatLayer.ZIndex = 202
+                    SVSatLayer.Parent = SVPicker
+                    Instance.new("UICorner", SVSatLayer).CornerRadius = UDim.new(0, 4)
+                    local satGrad = Instance.new("UIGradient")
+                    satGrad.Color = ColorSequence.new({
+                        ColorSequenceKeypoint.new(0, Color3.fromRGB(255, 255, 255)),
+                        ColorSequenceKeypoint.new(1, Color3.fromRGB(255, 255, 255)),
+                    })
+                    satGrad.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 0),
+                        NumberSequenceKeypoint.new(1, 1),
+                    })
+                    satGrad.Parent = SVSatLayer
+
+                    -- Layer value (transparan atas → hitam bawah)
+                    local SVValLayer = Instance.new("Frame")
+                    SVValLayer.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+                    SVValLayer.BorderSizePixel = 0
+                    SVValLayer.Size = UDim2.new(1, 0, 1, 0)
+                    SVValLayer.ZIndex = 203
+                    SVValLayer.Parent = SVPicker
+                    Instance.new("UICorner", SVValLayer).CornerRadius = UDim.new(0, 4)
+                    local valGrad = Instance.new("UIGradient")
+                    valGrad.Rotation = 90
+                    valGrad.Color = ColorSequence.new({
+                        ColorSequenceKeypoint.new(0, Color3.fromRGB(0, 0, 0)),
+                        ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0)),
+                    })
+                    valGrad.Transparency = NumberSequence.new({
+                        NumberSequenceKeypoint.new(0, 1),
+                        NumberSequenceKeypoint.new(1, 0),
+                    })
+                    valGrad.Parent = SVValLayer
+
+                    local SVCursor = Instance.new("Frame")
+                    SVCursor.Name = "SVCursor"
+                    SVCursor.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                    SVCursor.BorderSizePixel = 0
+                    SVCursor.Size = UDim2.new(0, 10, 0, 10)
+                    SVCursor.AnchorPoint = Vector2.new(0.5, 0.5)
+                    SVCursor.Position = UDim2.new(1, 0, 0, 0)
+                    SVCursor.ZIndex = 204  -- di atas semua gradient layer (201,202,203)
+                    SVCursor.Parent = SVPicker
+                    Instance.new("UICorner", SVCursor).CornerRadius = UDim.new(1, 0)
+                    local svCursorStroke = Instance.new("UIStroke")
+                    svCursorStroke.Color = Color3.fromRGB(255, 255, 255)
+                    svCursorStroke.Thickness = 1.5
+                    svCursorStroke.Parent = SVCursor
+
+                    -- Preview + Hex
+                    local ColorPreview = Instance.new("Frame")
+                    ColorPreview.BackgroundColor3 = cpColor
+                    ColorPreview.BorderSizePixel = 0
+                    ColorPreview.Position = UDim2.new(0, 10, 0, 158)
+                    ColorPreview.Size = UDim2.new(0, 40, 0, 22)
+                    ColorPreview.ZIndex = 201
+                    ColorPreview.Parent = CPPopup
+                    Instance.new("UICorner", ColorPreview).CornerRadius = UDim.new(0, 4)
+
+                    local HexLabel = Instance.new("TextLabel")
+                    HexLabel.Font = Enum.Font.GothamBold
+                    HexLabel.TextSize = 11
+                    HexLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+                    HexLabel.BackgroundTransparency = 1
+                    HexLabel.Position = UDim2.new(0, 56, 0, 158)
+                    HexLabel.Size = UDim2.new(0, 95, 0, 22)
+                    HexLabel.ZIndex = 201
+                    HexLabel.TextXAlignment = Enum.TextXAlignment.Left
+                    HexLabel.Parent = CPPopup
+
+                    -- (no close button)
+
+                    -- R G B inputs
+                    local function MakeChannelInput(label, xOffset, defaultVal)
+                        local f = Instance.new("Frame")
+                        f.BackgroundColor3 = Color3.fromRGB(35, 35, 45)
+                        f.BorderSizePixel = 0
+                        f.Position = UDim2.new(0, xOffset, 0, 186)
+                        f.Size = UDim2.new(0, 50, 0, 20)
+                        f.ZIndex = 201
+                        f.Parent = CPPopup
+                        Instance.new("UICorner", f).CornerRadius = UDim.new(0, 4)
+                        local lbl = Instance.new("TextLabel")
+                        lbl.Text = label
+                        lbl.Font = Enum.Font.GothamBold
+                        lbl.TextSize = 9
+                        lbl.TextColor3 = Color3.fromRGB(150, 150, 150)
+                        lbl.BackgroundTransparency = 1
+                        lbl.Size = UDim2.new(0, 14, 1, 0)
+                        lbl.Position = UDim2.new(0, 3, 0, 0)
+                        lbl.ZIndex = 202
+                        lbl.Parent = f
+                        local tb = Instance.new("TextBox")
+                        tb.Font = Enum.Font.GothamBold
+                        tb.TextSize = 10
+                        tb.TextColor3 = Color3.fromRGB(230, 230, 230)
+                        tb.BackgroundTransparency = 1
+                        tb.Text = tostring(defaultVal)
+                        tb.Size = UDim2.new(1, -18, 1, 0)
+                        tb.Position = UDim2.new(0, 16, 0, 0)
+                        tb.ClearTextOnFocus = false
+                        tb.ZIndex = 202
+                        tb.Parent = f
+                        return tb
+                    end
+
+                    local rBox = MakeChannelInput("R", 10, 255)
+                    local gBox = MakeChannelInput("G", 65, 255)
+                    local bBox = MakeChannelInput("B", 120, 255)
+
+                    local currentH, currentS, currentV = Color3.toHSV(cpColor)
+
+                    local function ColorToHex(c)
+                        return string.format("#%02X%02X%02X",
+                            math.floor(c.R * 255 + 0.5),
+                            math.floor(c.G * 255 + 0.5),
+                            math.floor(c.B * 255 + 0.5))
+                    end
+
+                    local function ApplyColor(col)
+                        cpColor = col
+                        ColorBox.BackgroundColor3 = col
+                        ColorPreview.BackgroundColor3 = col
+                        HexLabel.Text = ColorToHex(col)
+                        rBox.Text = tostring(math.floor(col.R * 255 + 0.5))
+                        gBox.Text = tostring(math.floor(col.G * 255 + 0.5))
+                        bBox.Text = tostring(math.floor(col.B * 255 + 0.5))
+                        ColorpickerFunc.Value = col
+                        ConfigData[colorKey] = { r = col.R, g = col.G, b = col.B }
+                        pcall(ToggleConfig.ColorCallback, col)
+                    end
+
+                    local function UpdateFromHSV()
+                        local col = Color3.fromHSV(currentH, currentS, currentV)
+                        SVPicker.BackgroundColor3 = Color3.fromHSV(currentH, 1, 1)
+                        SVCursor.Position = UDim2.new(currentS, -5, 1 - currentV, -5)
+                        HueCursor.Position = UDim2.new(0, -2, currentH, -1)
+                        ApplyColor(col)
+                    end
+
+                    UpdateFromHSV()
+
+                    -- posisi popup: tepat di bawah ColorBox, di screen space
+                    local function UpdatePopupPosition()
+                        local abs = ColorBox.AbsolutePosition
+                        local popW, popH = 180, 215
+                        local vpX, vpY = viewport.X, viewport.Y
+                        local px = abs.X - popW + 20
+                        local py = abs.Y + 26
+                        -- jangan keluar layar bawah
+                        if py + popH > vpY - 10 then py = abs.Y - popH - 4 end
+                        if px < 4 then px = 4 end
+                        CPPopup.Position = UDim2.new(0, px, 0, py)
+                    end
+
+                    -- Dragging SV — fix: .X/.Y bukan Vector3
+                    local svDragging = false
+                    SVPicker.InputBegan:Connect(function(inp)
+                        if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
+                            svDragging = true
+                        end
+                    end)
+                    UserInputService.InputEnded:Connect(function(inp)
+                        if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
+                            svDragging = false
+                        end
+                    end)
+                    UserInputService.InputChanged:Connect(function(inp)
+                        if not svDragging then return end
+                        if inp.UserInputType ~= Enum.UserInputType.MouseMovement and inp.UserInputType ~= Enum.UserInputType.Touch then return end
+                        local px = inp.Position.X - SVPicker.AbsolutePosition.X
+                        local py = inp.Position.Y - SVPicker.AbsolutePosition.Y
+                        currentS = math.clamp(px / SVPicker.AbsoluteSize.X, 0, 1)
+                        currentV = math.clamp(1 - (py / SVPicker.AbsoluteSize.Y), 0, 1)
+                        UpdateFromHSV()
+                    end)
+
+                    -- Dragging Hue — fix: .X/.Y bukan Vector3
+                    local hueDragging = false
+                    HueBar.InputBegan:Connect(function(inp)
+                        if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
+                            hueDragging = true
+                        end
+                    end)
+                    UserInputService.InputEnded:Connect(function(inp)
+                        if inp.UserInputType == Enum.UserInputType.MouseButton1 or inp.UserInputType == Enum.UserInputType.Touch then
+                            hueDragging = false
+                        end
+                    end)
+                    UserInputService.InputChanged:Connect(function(inp)
+                        if not hueDragging then return end
+                        if inp.UserInputType ~= Enum.UserInputType.MouseMovement and inp.UserInputType ~= Enum.UserInputType.Touch then return end
+                        local py = inp.Position.Y - HueBar.AbsolutePosition.Y
+                        currentH = math.clamp(py / HueBar.AbsoluteSize.Y, 0, 1)
+                        UpdateFromHSV()
+                    end)
+
+                    -- RGB input
+                    local function OnRGBInput()
+                        local r = math.clamp(tonumber(rBox.Text) or 0, 0, 255) / 255
+                        local g = math.clamp(tonumber(gBox.Text) or 0, 0, 255) / 255
+                        local b = math.clamp(tonumber(bBox.Text) or 0, 0, 255) / 255
+                        local col = Color3.new(r, g, b)
+                        currentH, currentS, currentV = Color3.toHSV(col)
+                        UpdateFromHSV()
+                    end
+                    rBox.FocusLost:Connect(OnRGBInput)
+                    gBox.FocusLost:Connect(OnRGBInput)
+                    bBox.FocusLost:Connect(OnRGBInput)
+
+                    -- Backdrop full-screen: nyerap semua klik di luar popup
+                    local CPBackdrop = Instance.new("Frame")
+                    CPBackdrop.Name = "CPBackdrop"
+                    CPBackdrop.BackgroundTransparency = 1
+                    CPBackdrop.Size = UDim2.new(1, 0, 1, 0)
+                    CPBackdrop.Position = UDim2.new(0, 0, 0, 0)
+                    CPBackdrop.ZIndex = 199
+                    CPBackdrop.Visible = false
+                    CPBackdrop.Parent = cpScreenGui
+
+                    -- Tutup popup hanya kalau klik di luar (bukan drag release)
+                    local wasDragging = false
+                    UserInputService.InputBegan:Connect(function(inp)
+                        if not cpOpen then return end
+                        if inp.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
+                        wasDragging = false
+                    end)
+                    UserInputService.InputChanged:Connect(function(inp)
+                        if inp.UserInputType == Enum.UserInputType.MouseMovement and (svDragging or hueDragging) then
+                            wasDragging = true
+                        end
+                    end)
+                    UserInputService.InputEnded:Connect(function(inp)
+                        if not cpOpen then return end
+                        if inp.UserInputType ~= Enum.UserInputType.MouseButton1 then return end
+                        if wasDragging then wasDragging = false return end
+                        -- cek apakah posisi klik di luar popup
+                        local mp = inp.Position
+                        local pp = CPPopup.AbsolutePosition
+                        local ps = CPPopup.AbsoluteSize
+                        local inPopup = mp.X >= pp.X and mp.X <= pp.X + ps.X
+                            and mp.Y >= pp.Y and mp.Y <= pp.Y + ps.Y
+                        if not inPopup then
+                            SetPopupOpen(false)
+                        end
+                    end)
+
+                    local function SetPopupOpen(open)
+                        cpOpen = open
+                        if open then
+                            UpdatePopupPosition()
+                        end
+                        CPPopup.Visible = open
+                        CPBackdrop.Visible = open
+                    end
+
+                    ColorBox.MouseButton1Click:Connect(function()
+                        SetPopupOpen(not cpOpen)
+                    end)
+
+                    function ColorpickerFunc:Set(col)
+                        if typeof(col) ~= "Color3" then return end
+                        currentH, currentS, currentV = Color3.toHSV(col)
+                        UpdateFromHSV()
+                    end
+
+                    function ColorpickerFunc:Get()
+                        return cpColor
+                    end
+                end
+
                 --// TOGGLE VISUAL
                 FeatureFrame2.Name = "ToggleVisual"
                 FeatureFrame2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
@@ -2415,7 +2799,12 @@ function Menghub:Window(GuiConfig)
                 ToggleFunc:Set(ToggleFunc.Value)
                 CountItem = CountItem + 1
                 Elements[configKey] = ToggleFunc
-                
+
+                if ToggleConfig.Colorpicker then
+                    ToggleFunc.Colorpicker = ColorpickerFunc
+                    return ToggleFunc, ColorpickerFunc
+                end
+
                 return ToggleFunc
             end
 
