@@ -132,11 +132,13 @@ local function safeSize(pxWidth, pxHeight)
     return UDim2.new(scaleX, 0, scaleY, 0)
 end
 
+local isDraggingLocked = false
 local function MakeDraggable(topbarobject, object)
     local function CustomPos(topbarobject, object)
         local Dragging, DragInput, DragStart, StartPosition
 
         local function UpdatePos(input)
+            if isDraggingLocked then return end  -- lock check
             local Delta = input.Position - DragStart
             local pos = UDim2.new(
                 StartPosition.X.Scale,
@@ -144,12 +146,11 @@ local function MakeDraggable(topbarobject, object)
                 StartPosition.Y.Scale,
                 StartPosition.Y.Offset + Delta.Y
             )
-            -- local Tween = TweenService:Create(object, TweenInfo.new(0.2), { Position = pos })
-            -- Tween:Play()
             object.Position = pos
         end
 
         topbarobject.InputBegan:Connect(function(input)
+            if isDraggingLocked then return end  -- lock check
             if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 Dragging = true
                 DragStart = input.Position
@@ -200,6 +201,7 @@ local function MakeDraggable(topbarobject, object)
         changesizeobject.Parent = object
 
         local function UpdateSize(input)
+            if isDraggingLocked then return end  -- lock check
             local Delta = input.Position - DragStart
             local newWidth = StartSize.X.Offset + Delta.X
             local newHeight = StartSize.Y.Offset + Delta.Y
@@ -212,6 +214,7 @@ local function MakeDraggable(topbarobject, object)
         end
 
         changesizeobject.InputBegan:Connect(function(input)
+            if isDraggingLocked then return end  -- lock check
             if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
                 Dragging = true
                 DragStart = input.Position
@@ -1197,6 +1200,9 @@ function Menghub:Window(GuiConfig)
             if game.CoreGui:FindFirstChild("ToggleUIButton") then
                 game.CoreGui.ToggleUIButton:Destroy()
             end
+            if game.CoreGui:FindFirstChild("LockGui") then  -- tambah ini
+                game.CoreGui.LockGui:Destroy()
+            end
         end)
 
         Cancel.MouseButton1Click:Connect(function()
@@ -1283,7 +1289,93 @@ function Menghub:Window(GuiConfig)
 
     DropShadowHolder.Size = UDim2.new(0, 115 + TextLabel.TextBounds.X + 1 + TextLabel1.TextBounds.X, 0, 350)
     MakeDraggable(Top, DropShadowHolder)
+    if isMobile then
+        local LockGui = Instance.new("ScreenGui")
+        LockGui.Name = "LockGui"
+        LockGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        LockGui.ResetOnSpawn = false
+        LockGui.Parent = CoreGui
 
+        local LockBtn = Instance.new("TextButton")
+        LockBtn.Name = "LockBtn"
+        LockBtn.Position = UDim2.new(0, 20, 0, viewport.Y * 0.2)
+        LockBtn.Size = UDim2.new(0, 90, 0, 36)
+        LockBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 26)
+        LockBtn.BackgroundTransparency = 0.1
+        LockBtn.BorderSizePixel = 0
+        LockBtn.Font = Enum.Font.GothamBold
+        LockBtn.Text = "LOCK"
+        LockBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+        LockBtn.TextSize = 13
+        LockBtn.ZIndex = 50
+        LockBtn.AutoButtonColor = false
+        LockBtn.Parent = LockGui
+
+        Instance.new("UICorner", LockBtn).CornerRadius = UDim.new(0, 8)
+
+        local LockStroke = Instance.new("UIStroke")
+        LockStroke.Color = Color3.fromRGB(255, 255, 255)
+        LockStroke.Thickness = 1
+        LockStroke.Transparency = 0.75
+        LockStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        LockStroke.Parent = LockBtn
+
+        -- draggable
+        local lbDragging = false
+        local lbDragStart, lbStartPos
+        local lbMoved = false
+
+        LockBtn.InputBegan:Connect(function(inp)
+            if inp.UserInputType == Enum.UserInputType.Touch then
+                lbDragging = true
+                lbMoved = false
+                lbDragStart = inp.Position
+                lbStartPos = LockBtn.Position
+                inp.Changed:Connect(function()
+                    if inp.UserInputState == Enum.UserInputState.End then
+                        lbDragging = false
+                    end
+                end)
+            end
+        end)
+
+        UserInputService.InputChanged:Connect(function(inp)
+            if lbDragging and inp.UserInputType == Enum.UserInputType.Touch then
+                local delta = inp.Position - lbDragStart
+                if math.abs(delta.X) > 5 or math.abs(delta.Y) > 5 then
+                    lbMoved = true
+                end
+                LockBtn.Position = UDim2.new(
+                    lbStartPos.X.Scale,
+                    lbStartPos.X.Offset + delta.X,
+                    lbStartPos.Y.Scale,
+                    lbStartPos.Y.Offset + delta.Y
+                )
+            end
+        end)
+
+        local function SetLockState(locked)
+            isDraggingLocked = locked
+            if locked then
+                LockBtn.Text = "UNLOCK"
+                LockBtn.TextColor3 = GuiConfig.Color
+                LockStroke.Color = GuiConfig.Color
+                LockStroke.Transparency = 0.3
+                LockBtn.Size = UDim2.new(0, 110, 0, 36)
+            else
+                LockBtn.Text = "LOCK"
+                LockBtn.TextColor3 = Color3.fromRGB(180, 180, 180)
+                LockStroke.Color = Color3.fromRGB(255, 255, 255)
+                LockStroke.Transparency = 0.75
+                LockBtn.Size = UDim2.new(0, 90, 0, 36)
+            end
+        end
+
+        LockBtn.MouseButton1Click:Connect(function()
+            if lbMoved then return end
+            SetLockState(not isDraggingLocked)
+        end)
+    end
     local MoreBlur = Instance.new("Frame");
     local DropShadowHolder1 = Instance.new("Frame");
     local DropShadow1 = Instance.new("ImageLabel");
