@@ -1210,6 +1210,7 @@ function Menghub:Window(GuiConfig)
         end)
 
         -- getgenv().AntiAnalyticActive = false
+        getgenv().ShowRole = false
     end)
 
     local ToggleKey = Enum.KeyCode.F3
