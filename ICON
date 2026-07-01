@@ -2902,6 +2902,140 @@ function Menghub:Window(GuiConfig)
 
                 return ToggleFunc
             end
+        
+            function Items:AddCheckbox(CheckboxConfig)
+                local CheckboxConfig = CheckboxConfig or {}
+                CheckboxConfig.Title = CheckboxConfig.Title or "Checkbox"
+                CheckboxConfig.Content = CheckboxConfig.Content or ""
+                CheckboxConfig.Default = CheckboxConfig.Default or false
+                CheckboxConfig.Callback = CheckboxConfig.Callback or function() end
+
+                local configKey = "Checkbox_" .. CheckboxConfig.Title
+                if ConfigData[configKey] ~= nil then
+                    CheckboxConfig.Default = ConfigData[configKey]
+                end
+
+                local CheckboxFunc = { Value = CheckboxConfig.Default, Type = "Toggle" }
+
+                local Checkbox = Instance.new("Frame")
+                local UICorner20 = Instance.new("UICorner")
+                local CheckboxTitle = Instance.new("TextLabel")
+                local CheckboxContent = Instance.new("TextLabel")
+                local CheckboxButton = Instance.new("TextButton")
+                local RightSide = Instance.new("Frame")
+                local CheckboxVisual = Instance.new("Frame")
+                local UICornerVisual = Instance.new("UICorner")
+                local UIStrokeVisual = Instance.new("UIStroke")
+                local Checkmark = Instance.new("ImageLabel")
+
+                Checkbox.Name = "Checkbox_" .. CheckboxConfig.Title
+                Checkbox.Parent = SectionAdd
+                Checkbox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                Checkbox.BackgroundTransparency = 0.935
+                Checkbox.BorderSizePixel = 0
+                Checkbox.LayoutOrder = CountItem
+                Checkbox.Size = UDim2.new(1, 0, 0, 50)
+
+                UICorner20.CornerRadius = UDim.new(0, 4)
+                UICorner20.Parent = Checkbox
+
+                -- Right Side Container (sejajarkan dengan toggle)
+                RightSide.Name = "RightSide"
+                RightSide.Size = UDim2.new(0, 32, 1, 0)
+                RightSide.Position = UDim2.new(1, -16, 0, 0)   -- Disesuaikan
+                RightSide.AnchorPoint = Vector2.new(1, 0)
+                RightSide.BackgroundTransparency = 1
+                RightSide.Parent = Checkbox
+
+                -- Checkbox Box
+                CheckboxVisual.Name = "CheckboxVisual"
+                CheckboxVisual.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                CheckboxVisual.BackgroundTransparency = 0.92
+                CheckboxVisual.Size = UDim2.new(0, 22, 0, 22)
+                CheckboxVisual.Position = UDim2.new(0.5, -11, 0.5, -11)
+                CheckboxVisual.Parent = RightSide
+
+                UICornerVisual.CornerRadius = UDim.new(0, 5)
+                UICornerVisual.Parent = CheckboxVisual
+
+                UIStrokeVisual.Color = Color3.fromRGB(180, 180, 180)
+                UIStrokeVisual.Thickness = 1.6
+                UIStrokeVisual.Transparency = 0.75
+                UIStrokeVisual.Parent = CheckboxVisual
+
+                -- Checkmark
+                Checkmark.Name = "Checkmark"
+                Checkmark.Image = "rbxassetid://6031094678"
+                Checkmark.ImageColor3 = GuiConfig.Color
+                Checkmark.ImageTransparency = 1
+                Checkmark.BackgroundTransparency = 1
+                Checkmark.Size = UDim2.new(0, 18, 0, 18)
+                Checkmark.Position = UDim2.new(0.5, -9, 0.5, -9)
+                Checkmark.Parent = CheckboxVisual
+
+                -- Text Labels
+                CheckboxTitle.Font = Enum.Font.GothamBold
+                CheckboxTitle.Text = CheckboxConfig.Title
+                CheckboxTitle.TextSize = 13
+                CheckboxTitle.TextColor3 = Color3.fromRGB(231, 231, 231)
+                CheckboxTitle.TextXAlignment = Enum.TextXAlignment.Left
+                CheckboxTitle.BackgroundTransparency = 1
+                CheckboxTitle.Position = UDim2.new(0, 10, 0, 8)
+                CheckboxTitle.Size = UDim2.new(1, -70, 0, 13)
+                CheckboxTitle.Parent = Checkbox
+
+                CheckboxContent.Font = Enum.Font.GothamBold
+                CheckboxContent.Text = CheckboxConfig.Content
+                CheckboxContent.TextColor3 = Color3.fromRGB(255, 255, 255)
+                CheckboxContent.TextSize = 12
+                CheckboxContent.TextTransparency = 0.6
+                CheckboxContent.TextXAlignment = Enum.TextXAlignment.Left
+                CheckboxContent.BackgroundTransparency = 1
+                CheckboxContent.Position = UDim2.new(0, 10, 0, 24)
+                CheckboxContent.Size = UDim2.new(1, -70, 0, 12)
+                CheckboxContent.TextWrapped = true
+                CheckboxContent.Parent = Checkbox
+
+                local function UpdateHeight()
+                    local contentHeight = CheckboxContent.TextBounds.Y
+                    Checkbox.Size = UDim2.new(1, 0, 0, contentHeight + 38)
+                    if UpdateSizeSection then UpdateSizeSection() end
+                end
+                CheckboxContent:GetPropertyChangedSignal("TextBounds"):Connect(UpdateHeight)
+                UpdateHeight()
+
+                CheckboxButton.BackgroundTransparency = 1
+                CheckboxButton.Size = UDim2.new(1, 0, 1, 0)
+                CheckboxButton.ZIndex = 5
+                CheckboxButton.Text = ""
+                CheckboxButton.Parent = Checkbox
+
+                CheckboxButton.Activated:Connect(function()
+                    CheckboxFunc:Set(not CheckboxFunc.Value)
+                end)
+
+                function CheckboxFunc:Set(Value)
+                    CheckboxFunc.Value = Value
+                    ConfigData[configKey] = Value
+
+                    if Value then
+                        TweenService:Create(CheckboxTitle, TweenInfo.new(0.2), { TextColor3 = GuiConfig.Color }):Play()
+                        TweenService:Create(Checkmark, TweenInfo.new(0.2), { ImageTransparency = 0 }):Play()
+                    else
+                        TweenService:Create(CheckboxTitle, TweenInfo.new(0.2), { TextColor3 = Color3.fromRGB(231, 231, 231) }):Play()
+                        TweenService:Create(Checkmark, TweenInfo.new(0.2), { ImageTransparency = 1 }):Play()
+                    end
+
+                    pcall(CheckboxConfig.Callback, Value)
+                end
+
+                CheckboxFunc:Set(CheckboxFunc.Value)
+
+                CountItem = CountItem + 1
+                Elements[configKey] = CheckboxFunc
+
+                return CheckboxFunc
+            end
 
             function Items:AddSlider(SliderConfig)
                 local SliderConfig = SliderConfig or {}
