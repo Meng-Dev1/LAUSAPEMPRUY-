@@ -1193,8 +1193,6 @@ function Menghub:Window(GuiConfig)
             if LoadConfigElements then
                 LoadConfigElements()
             end
-            ScriptLoaded = false
-            NoclipEnabled = false
 
             if Menghubb then Menghubb:Destroy() end
             if game.CoreGui:FindFirstChild("ToggleUIButton") then
@@ -1203,6 +1201,8 @@ function Menghub:Window(GuiConfig)
             if game.CoreGui:FindFirstChild("LockGui") then  -- tambah ini
                 game.CoreGui.LockGui:Destroy()
             end
+
+            getgenv().SCRIPT_KEY = "YOUR_KEY_SYSTEM"
         end)
 
         Cancel.MouseButton1Click:Connect(function()
