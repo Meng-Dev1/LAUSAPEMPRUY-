@@ -1202,6 +1202,7 @@ function Menghub:Window(GuiConfig)
                 game.CoreGui.LockGui:Destroy()
             end
 
+            getgenv().MengHubLoaded = false
             getgenv().SCRIPT_KEY = "YOUR_KEY_SYSTEM"
         end)
 
