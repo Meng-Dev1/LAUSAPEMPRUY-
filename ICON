@@ -13,6 +13,10 @@ ConfigData = {}
 Elements = {} 
 CURRENT_VERSION = nil
 
+local function CheckIsPremium()
+    return getgenv().MengHubIsPremium
+end
+
 function SaveConfig(name)
     CheckFolders()
     local fileName = _G.ConfigFolder .. (name or "Default") .. ".json"
@@ -50,6 +54,12 @@ function LoadConfigElements()
         
         if element.Set then
             if targetValue ~= nil then
+                if element.Premium == true or string.find(key, "Premium", 1, true) then
+                    if not CheckIsPremium() then
+                        targetValue = false
+                    end
+                end
+
                 element:Set(targetValue)
             else
                 if element.Type == "Toggle" then
@@ -119,6 +129,179 @@ local function isMobileDevice()
 end
 
 local isMobile = isMobileDevice()
+
+--// PREMIUM TOOLTIP (shared, ngikutin cursor)
+local PremiumTooltipGui = Instance.new("ScreenGui")
+PremiumTooltipGui.Name = "MenghubPremiumTooltip"
+PremiumTooltipGui.ResetOnSpawn = false
+PremiumTooltipGui.IgnoreGuiInset = true
+PremiumTooltipGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+PremiumTooltipGui.Parent = CoreGui
+
+local PremiumTooltip = Instance.new("Frame")
+PremiumTooltip.Name = "PremiumTooltip"
+PremiumTooltip.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
+PremiumTooltip.BorderSizePixel = 0
+PremiumTooltip.AutomaticSize = Enum.AutomaticSize.X
+PremiumTooltip.Size = UDim2.new(0, 0, 0, 26)
+PremiumTooltip.Visible = false
+PremiumTooltip.ZIndex = 500
+PremiumTooltip.Parent = PremiumTooltipGui
+
+local PTCorner = Instance.new("UICorner")
+PTCorner.CornerRadius = UDim.new(0, 6)
+PTCorner.Parent = PremiumTooltip
+
+local PTStroke = Instance.new("UIStroke")
+PTStroke.Color = Color3.fromRGB(255, 195, 60)
+PTStroke.Thickness = 1
+PTStroke.Transparency = 0.35
+PTStroke.Parent = PremiumTooltip
+
+local PTPadding = Instance.new("UIPadding")
+PTPadding.PaddingLeft = UDim.new(0, 10)
+PTPadding.PaddingRight = UDim.new(0, 10)
+PTPadding.Parent = PremiumTooltip
+
+local PremiumTooltipLabel = Instance.new("TextLabel")
+PremiumTooltipLabel.Name = "Label"
+PremiumTooltipLabel.BackgroundTransparency = 1
+PremiumTooltipLabel.Font = Enum.Font.GothamBold
+PremiumTooltipLabel.Text = "Premium Required"
+PremiumTooltipLabel.TextColor3 = Color3.fromRGB(255, 195, 60)
+PremiumTooltipLabel.TextSize = 12
+PremiumTooltipLabel.Size = UDim2.new(0, 0, 1, 0)
+PremiumTooltipLabel.AutomaticSize = Enum.AutomaticSize.X
+PremiumTooltipLabel.ZIndex = 501
+PremiumTooltipLabel.Parent = PremiumTooltip-- Ganti seluruh PremiumTooltip setup jadi ini
+local PremiumTooltipGui = Instance.new("ScreenGui")
+PremiumTooltipGui.Name = "MenghubPremiumTooltip"
+PremiumTooltipGui.ResetOnSpawn = false
+PremiumTooltipGui.IgnoreGuiInset = true
+PremiumTooltipGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+PremiumTooltipGui.DisplayOrder = 999
+PremiumTooltipGui.Parent = CoreGui
+
+local PremiumTooltip = Instance.new("Frame")
+PremiumTooltip.Name = "PremiumTooltip"
+PremiumTooltip.BackgroundColor3 = Color3.fromRGB(28, 28, 32)
+PremiumTooltip.BorderSizePixel = 0
+PremiumTooltip.AutomaticSize = Enum.AutomaticSize.XY
+PremiumTooltip.Visible = false
+PremiumTooltip.ZIndex = 1
+PremiumTooltip.Parent = PremiumTooltipGui
+Instance.new("UICorner", PremiumTooltip).CornerRadius = UDim.new(0, 6)
+
+local PTStroke = Instance.new("UIStroke")
+PTStroke.Color = Color3.fromRGB(60, 60, 70)
+PTStroke.Thickness = 1
+PTStroke.Transparency = 0
+PTStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+PTStroke.Parent = PremiumTooltip
+
+local PTPadding = Instance.new("UIPadding")
+PTPadding.PaddingLeft   = UDim.new(0, 10)
+PTPadding.PaddingRight  = UDim.new(0, 10)
+PTPadding.PaddingTop    = UDim.new(0, 6)
+PTPadding.PaddingBottom = UDim.new(0, 6)
+PTPadding.Parent = PremiumTooltip
+
+local PremiumTooltipLabel = Instance.new("TextLabel")
+PremiumTooltipLabel.Name = "Label"
+PremiumTooltipLabel.BackgroundTransparency = 1
+PremiumTooltipLabel.Font = Enum.Font.Code
+PremiumTooltipLabel.Text = "unlock this with premium"
+PremiumTooltipLabel.TextColor3 = Color3.fromRGB(220, 220, 220)
+PremiumTooltipLabel.TextSize = 13
+PremiumTooltipLabel.Size = UDim2.new(0, 0, 0, 0)
+PremiumTooltipLabel.AutomaticSize = Enum.AutomaticSize.XY
+PremiumTooltipLabel.ZIndex = 2
+PremiumTooltipLabel.Parent = PremiumTooltip
+
+local premiumTooltipMoveConn = nil
+
+local function UpdatePremiumTooltipPos(x, y)
+    local tooltipW = PremiumTooltip.AbsoluteSize.X
+    local tooltipH = PremiumTooltip.AbsoluteSize.Y
+    local px = x + 14
+    local py = y + 20  -- di BAWAH cursor, bukan di atas
+    if px + tooltipW > viewport.X - 5 then
+        px = viewport.X - tooltipW - 5
+    end
+    if py + tooltipH > viewport.Y - 5 then
+        py = y - tooltipH - 8  -- kalau ga muat di bawah, baru taruh di atas
+    end
+    PremiumTooltip.Position = UDim2.new(0, px, 0, py)
+end
+
+local function ShowPremiumTooltip()
+    local mp = UserInputService:GetMouseLocation()
+    PremiumTooltip.Visible = true
+    UpdatePremiumTooltipPos(mp.X, mp.Y)
+    if premiumTooltipMoveConn then premiumTooltipMoveConn:Disconnect() end
+    premiumTooltipMoveConn = UserInputService.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement
+        or input.UserInputType == Enum.UserInputType.Touch then
+            UpdatePremiumTooltipPos(input.Position.X, input.Position.Y)
+        end
+    end)
+end
+
+local function HidePremiumTooltip()
+    PremiumTooltip.Visible = false
+    if premiumTooltipMoveConn then
+        premiumTooltipMoveConn:Disconnect()
+        premiumTooltipMoveConn = nil
+    end
+end
+
+local function AttachPremiumLock(button, isPremiumFeature)
+    if not isPremiumFeature then return end
+
+    if CheckIsPremium() then
+        return
+    end
+
+    -- Tunggu sebentar biar UI fully built
+    task.spawn(function()
+        local parent = button.Parent
+        if not parent then return end
+
+        -- Cari title label dengan cara lebih robust
+        local titleLabel = parent:FindFirstChild("ToggleTitle") 
+                       or parent:FindFirstChild("CheckboxTitle")
+                       or parent:FindFirstChildWhichIsA("TextLabel") -- fallback
+
+        -- Kalau masih belum ketemu, coba cari di children yang namanya mengandung "Title"
+        if not titleLabel then
+            for _, child in ipairs(parent:GetChildren()) do
+                if child:IsA("TextLabel") and (child.Name:find("Title") or child.Name:find("toggle",1,true)) then
+                    titleLabel = child
+                    break
+                end
+            end
+        end
+
+        if titleLabel and titleLabel.Text then
+            -- Pastikan RichText aktif
+            titleLabel.RichText = true
+            
+            -- Tambahkan * (jangan tambah berkali-kali)
+            if not titleLabel.Text:find("<font color=") then
+                titleLabel.Text = titleLabel.Text .. ' <font color="#C4A0FF" size="18" baseline="1"><b>*</b></font>'
+            end
+        end
+    end)
+
+    -- Event tetap sama
+    button.MouseEnter:Connect(function()
+        if not CheckIsPremium() then 
+            ShowPremiumTooltip() 
+        end
+    end)
+    button.MouseLeave:Connect(HidePremiumTooltip)
+    -- button.MouseButton1Click:Connect(HidePremiumTooltip)
+end
 
 local function safeSize(pxWidth, pxHeight)
     local scaleX = pxWidth / viewport.X
@@ -1194,6 +1377,11 @@ function Menghub:Window(GuiConfig)
                 LoadConfigElements()
             end
 
+            HidePremiumTooltip()
+            if CoreGui:FindFirstChild("MenghubPremiumTooltip") then
+                CoreGui.MenghubPremiumTooltip:Destroy()
+            end
+
             if Menghubb then Menghubb:Destroy() end
             if game.CoreGui:FindFirstChild("ToggleUIButton") then
                 game.CoreGui.ToggleUIButton:Destroy()
@@ -2255,6 +2443,7 @@ function Menghub:Window(GuiConfig)
                 ToggleConfig.Colorpicker = ToggleConfig.Colorpicker or false
                 ToggleConfig.ColorDefault = ToggleConfig.ColorDefault or Color3.fromRGB(255, 255, 255)
                 ToggleConfig.ColorCallback = ToggleConfig.ColorCallback or function() end
+                ToggleConfig.Premium = ToggleConfig.Premium or false
 
                 local configKey = "Toggle_" .. ToggleConfig.Title
                 local keybindKey = "Keybind_" .. ToggleConfig.Title
@@ -2274,6 +2463,8 @@ function Menghub:Window(GuiConfig)
                 end
 
                 local ToggleFunc = { Value = ToggleConfig.Default, Type = "Toggle" }
+                ToggleFunc.Premium = ToggleConfig.Premium
+
                 local KeybindFunc = { Value = "Keybind", Type = "Keybind" }
                 local ColorpickerFunc = { Value = ToggleConfig.ColorDefault, Type = "Colorpicker" }
                 local isInCallback = false
@@ -2419,6 +2610,9 @@ function Menghub:Window(GuiConfig)
                             end
 
                             if modMatch then
+                                if ToggleConfig.Premium and not CheckIsPremium() then
+                                    return
+                                end
                                 ToggleFunc:Set(not ToggleFunc.Value)
                             end
                         end
@@ -2829,6 +3023,7 @@ function Menghub:Window(GuiConfig)
                 ToggleTitle.Position = UDim2.new(0, 10, 0, 8)
                 ToggleTitle.Size = UDim2.new(1, -160, 0, 13)
                 ToggleTitle.Parent = Toggle
+                ToggleTitle.RichText = true
 
                 ToggleContent.Font = Enum.Font.GothamBold
                 ToggleContent.Text = ToggleConfig.Content
@@ -2859,9 +3054,16 @@ function Menghub:Window(GuiConfig)
                 ToggleButton.Parent = Toggle
 
                 ToggleButton.Activated:Connect(function()
+                    if ToggleConfig.Premium and not CheckIsPremium() then
+                        return
+                    end
                     if not isListening then
                         ToggleFunc:Set(not ToggleFunc.Value)
                     end
+                end)
+
+                task.delay(0.05, function()
+                    AttachPremiumLock(ToggleButton, ToggleConfig.Premium)
                 end)
 
                 --// TOGGLE FUNC SET
@@ -2910,6 +3112,7 @@ function Menghub:Window(GuiConfig)
                 CheckboxConfig.Content = CheckboxConfig.Content or ""
                 CheckboxConfig.Default = CheckboxConfig.Default or false
                 CheckboxConfig.Callback = CheckboxConfig.Callback or function() end
+                CheckboxConfig.Premium = CheckboxConfig.Premium or false
 
                 local configKey = "Checkbox_" .. CheckboxConfig.Title
                 if ConfigData[configKey] ~= nil then
@@ -2917,6 +3120,7 @@ function Menghub:Window(GuiConfig)
                 end
 
                 local CheckboxFunc = { Value = CheckboxConfig.Default, Type = "Toggle" }
+                CheckboxFunc.Premium = CheckboxConfig.Premium
 
                 local Checkbox = Instance.new("Frame")
                 local UICorner20 = Instance.new("UICorner")
@@ -2984,6 +3188,7 @@ function Menghub:Window(GuiConfig)
                 CheckboxTitle.Position = UDim2.new(0, 10, 0, 8)
                 CheckboxTitle.Size = UDim2.new(1, -70, 0, 13)
                 CheckboxTitle.Parent = Checkbox
+                CheckboxTitle.RichText = true
 
                 CheckboxContent.Font = Enum.Font.GothamBold
                 CheckboxContent.Text = CheckboxConfig.Content
@@ -3012,7 +3217,14 @@ function Menghub:Window(GuiConfig)
                 CheckboxButton.Parent = Checkbox
 
                 CheckboxButton.Activated:Connect(function()
+                    if CheckboxConfig.Premium and not CheckIsPremium() then
+                        return
+                    end
                     CheckboxFunc:Set(not CheckboxFunc.Value)
+                end)
+
+                task.delay(0.05, function()
+                    AttachPremiumLock(CheckboxButton, CheckboxConfig.Premium)
                 end)
 
                 function CheckboxFunc:Set(Value)
