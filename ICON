@@ -1413,6 +1413,8 @@ function Menghub:Window(GuiConfig)
     end)
 
     function GuiFunc:ToggleUI()
+        local UserInputService = game:GetService("UserInputService")
+
         local ScreenGui = Instance.new("ScreenGui")
         ScreenGui.Parent = game:GetService("CoreGui")
         ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
@@ -1427,7 +1429,7 @@ function Menghub:Window(GuiConfig)
         MainButton.ScaleType = Enum.ScaleType.Fit
 
         local UICorner = Instance.new("UICorner")
-        UICorner.CornerRadius = UDim.new(0, 6)
+        UICorner.CornerRadius = UDim.new(1, 0)
         UICorner.Parent = MainButton
 
         local Button = Instance.new("TextButton")
@@ -1443,6 +1445,7 @@ function Menghub:Window(GuiConfig)
         end)
 
         local dragging = false
+        local dragInput = nil
         local dragStart, startPos
 
         local function update(input)
@@ -1460,6 +1463,7 @@ function Menghub:Window(GuiConfig)
                 dragging = true
                 dragStart = input.Position
                 startPos = MainButton.Position
+
                 input.Changed:Connect(function()
                     if input.UserInputState == Enum.UserInputState.End then
                         dragging = false
@@ -1468,8 +1472,14 @@ function Menghub:Window(GuiConfig)
             end
         end)
 
-        game:GetService("UserInputService").InputChanged:Connect(function(input)
-            if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
+        Button.InputChanged:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+                dragInput = input
+            end
+        end)
+
+        UserInputService.InputChanged:Connect(function(input)
+            if dragging and input == dragInput then
                 update(input)
             end
         end)
