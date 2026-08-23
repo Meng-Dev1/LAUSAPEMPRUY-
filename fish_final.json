@@ -409,7 +409,7 @@
   },
   {
     "name": "Barracuda Fish",
-    "image": "https://tr.rbxcdn.com/180DAY-de2fa7de7acb5f2b7cb5d24d76a98f95/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-b5438066027de2760ef8a4a5d17722f1/420/420/Image/Png/noFilter"
   },
   {
     "name": "Beach Ball",
@@ -689,7 +689,7 @@
   },
   {
     "name": "Crystal Crab",
-    "image": "https://tr.rbxcdn.com/180DAY-644fdd8d9b29c3c4da83e170b9b3eab0/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-cad8740f29b6a0351027ad2bb10fbbba/420/420/Image/Png/noFilter"
   },
   {
     "name": "Crystal Pufferfish",
@@ -925,7 +925,7 @@
   },
   {
     "name": "Frog",
-    "image": "https://tr.rbxcdn.com/180DAY-9e3bab1a22053b37881140ef308f1107/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-7e8dd266fde6e75079affca910908be8/420/420/Image/Png/noFilter"
   },
   {
     "name": "Frost Crab",
@@ -977,7 +977,7 @@
   },
   {
     "name": "Gar Fish",
-    "image": "https://tr.rbxcdn.com/180DAY-7b698a7f4b63739fec9b516ee2ba028c/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-3a58c0175dc3eee28fcd1aab7ae46cdc/420/420/Image/Png/noFilter"
   },
   {
     "name": "Ghastly Crab",
@@ -1241,7 +1241,7 @@
   },
   {
     "name": "Lake Sturgeon",
-    "image": "https://tr.rbxcdn.com/180DAY-2e7631b1fa369e216e1abc6f77c0f160/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-55fd8a2233a4e1be3c51d5524bb8e5c5/420/420/Image/Png/noFilter"
   },
   {
     "name": "Lava Butterfly",
@@ -1301,7 +1301,7 @@
   },
   {
     "name": "Longnose Butterfly",
-    "image": "https://tr.rbxcdn.com/180DAY-6a5877954427691e8a4ff7bcba089885/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-3e9e7f1015e40d90c6a0a1b4a6e44169/420/420/Image/Png/noFilter"
   },
   {
     "name": "Loving Shark",
@@ -1513,7 +1513,7 @@
   },
   {
     "name": "Orca",
-    "image": "https://tr.rbxcdn.com/180DAY-e3d4495262428ed404619d8e6f16d6ec/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-394c0fc36133f3ea7ab5015fbca5d9b3/420/420/Image/Png/noFilter"
   },
   {
     "name": "Ornament Fish",
@@ -1949,7 +1949,7 @@
   },
   {
     "name": "Starjam Tang",
-    "image": "https://tr.rbxcdn.com/180DAY-6c54b0cb433210c0c1f04d5a56c627ec/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-40e278be52976ba1f351d5ea017ed2c1/420/420/Image/Png/noFilter"
   },
   {
     "name": "Starlight Crab",
@@ -2256,6 +2256,10 @@
     "image": "https://tr.rbxcdn.com/180DAY-a95fae1f578bd817f5a8000afa35aa17/420/420/Image/Png/noFilter"
   },
   {
+    "name": "Thunderstorm Jelly",
+    "image": "https://tr.rbxcdn.com/180DAY-f4024a5cda71742f880316214c3de03a/420/420/Image/Png/noFilter"
+  },
+  {
     "name": "Blue Moonfish",
     "image": "https://tr.rbxcdn.com/180DAY-ed277ce0ba05c91c63fece73b465fea5/420/420/Image/Png/noFilter"
   },
@@ -2437,7 +2441,7 @@
   },
   {
     "name": "Broken Heart Nessie",
-    "image": "https://tr.rbxcdn.com/180DAY-b5db05a4c6f0ec6d8e66cebcb37e6519/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-47c5956b2d1dbf4f54454685ad4bbb94/420/420/Image/Png/noFilter"
   },
   {
     "name": "Carrot Eel",
@@ -3302,6 +3306,98 @@
   {
     "name": "Crimson Dreadtusk",
     "image": "https://tr.rbxcdn.com/180DAY-e00e4c76aae2ff89760a6a17cbdcb3c9/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Zapfish",
+    "image": "https://t4.rbxcdn.com/180DAY-92f01c392ee9a79829852ac02d3fb15a"
+  },
+  {
+    "name": "Frostspine Hake",
+    "image": "https://t4.rbxcdn.com/180DAY-92f01c392ee9a79829852ac02d3fb15a"
+  },
+  {
+    "name": "Obsidian Prawn",
+    "image": "https://t4.rbxcdn.com/180DAY-92f01c392ee9a79829852ac02d3fb15a"
+  },
+  {
+    "name": "CinderSail",
+    "image": "https://tr.rbxcdn.com/180DAY-80e4b1e142d5c65a7d3db4b21babee4b/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Molten Parrotfish",
+    "image": "https://tr.rbxcdn.com/180DAY-9abf8523f08b19d45688aa5688e1be83/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Bluehood Nautilus",
+    "image": "https://tr.rbxcdn.com/180DAY-7d2441d7cc92f99ba15bfe3f3b45db6e/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Tempest Stonefish",
+    "image": "https://tr.rbxcdn.com/180DAY-ab012995e8c56663a94830a65a53ad76/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Lightning Grouper",
+    "image": "https://tr.rbxcdn.com/180DAY-061eacfdce974be61e964cc093e2df35/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Glacial Fangtooth",
+    "image": "https://tr.rbxcdn.com/180DAY-630ea11aae2063e2aab3d7cc93832ed8/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Cinderplate Coelacanth",
+    "image": "https://tr.rbxcdn.com/180DAY-27d38f93603a99a8a7c3893be8d75d45/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Flashfin Swordfish",
+    "image": "https://tr.rbxcdn.com/180DAY-92db2465b89599f51b149d41a4dcefb3/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Ripplefin",
+    "image": "https://tr.rbxcdn.com/180DAY-c55766a2b87a960e2a5992ea19a9509d/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Basalt Ghost Shark",
+    "image": "https://tr.rbxcdn.com/180DAY-b7162c9aef2b59c682bdf834164f3992/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Thunderhead Cuttlefish",
+    "image": "https://tr.rbxcdn.com/180DAY-f5278eb425be808c15141cdd88dd181f/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Glacierback Sea Turtle",
+    "image": "https://tr.rbxcdn.com/180DAY-7ba46ba4c1459a34275c11997398ea26/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Tidecrest Dolphin",
+    "image": "https://tr.rbxcdn.com/180DAY-6a8f9449abe71bc9a97043ea8b81948f/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Magmaquill Pufferfish",
+    "image": "https://tr.rbxcdn.com/180DAY-c187fcdfd3db0fb439faa00def693e83/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Stormfrill Axolotl",
+    "image": "https://tr.rbxcdn.com/180DAY-39ca03e661a99f36268ca11c88710fd7/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Frostglass Mako Shark",
+    "image": "https://tr.rbxcdn.com/180DAY-c5942c3fb78376c231af0954d2f21393/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Cindering Reefback",
+    "image": "https://tr.rbxcdn.com/180DAY-2a24f933872e0dd1156fd5a7459b9ae6/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Pyrocoil",
+    "image": "https://t4.rbxcdn.com/180DAY-92f01c392ee9a79829852ac02d3fb15a"
+  },
+  {
+    "name": "Stormshell Brute",
+    "image": "https://tr.rbxcdn.com/180DAY-2d1ca308b28610cacaca164d2860624d/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Wintertusk Mammofin",
+    "image": "https://tr.rbxcdn.com/180DAY-b6b4b3b2004aebb7149995505e38e48a/420/420/Image/Png/noFilter"
   },
   {
     "name": "Runic Enchant Stone",
