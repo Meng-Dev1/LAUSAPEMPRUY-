@@ -2589,35 +2589,35 @@
   },
   {
     "name": "Cosmic Bass",
-    "image": "https://tr.rbxcdn.com/180DAY-65ba57cec171277c91f8943414bc1663/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-59881a88a2972b56d3450e777154e4f5/420/420/Image/Png/noFilter"
   },
   {
     "name": "Cosmic Blobfish",
-    "image": "https://tr.rbxcdn.com/180DAY-a0f27146b4adf5f73bb2f50c5dbe732f/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-fcf6b286a09614dbeb9eda434779bc51/420/420/Image/Png/noFilter"
   },
   {
     "name": "Cosmic Hammerhead Shark",
-    "image": "https://tr.rbxcdn.com/180DAY-2b7d8997a49757cbec02002ed9425c05/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-df7eb898ce10ea0e3832133cb9224098/420/420/Image/Png/noFilter"
   },
   {
     "name": "Cosmic Jellyfish",
-    "image": "https://tr.rbxcdn.com/180DAY-4c58ba7fa6002312f7f9894f1664e1fc/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-e62d13d7e90e2294f29b0c2350c13cd9/420/420/Image/Png/noFilter"
   },
   {
     "name": "Cosmic Mutant Shark",
-    "image": "https://tr.rbxcdn.com/180DAY-a6481e514f78469a369dc4293f53f1fe/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-9ce737998142bf9476d75b44fe5264f4/420/420/Image/Png/noFilter"
   },
   {
     "name": "Cosmic Seahorse",
-    "image": "https://tr.rbxcdn.com/180DAY-401a77445d06794b428438f450283220/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-a65cb728261b0f43558ee105e732219c/420/420/Image/Png/noFilter"
   },
   {
     "name": "Cosmic Seastar",
-    "image": "https://tr.rbxcdn.com/180DAY-6b927655dc0afff1e212d6128d6dfea9/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-1e391267521bb4c46ec20cb6ac0ccb0d/420/420/Image/Png/noFilter"
   },
   {
     "name": "Cosmic Tailfish",
-    "image": "https://tr.rbxcdn.com/180DAY-7d8454a70393399ee0a558e450e55675/420/420/Image/Png/noFilter"
+    "image": "https://tr.rbxcdn.com/180DAY-73ab6f0c68d6feb0e8ce798ee4adbdf5/420/420/Image/Png/noFilter"
   },
   {
     "name": "Crimson Octopus",
@@ -3398,6 +3398,74 @@
   {
     "name": "Wintertusk Mammofin",
     "image": "https://tr.rbxcdn.com/180DAY-b6b4b3b2004aebb7149995505e38e48a/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "ELEMENTAL HYDRA",
+    "image": "https://tr.rbxcdn.com/180DAY-da3c22204ce43333cf8c263bffe5c697/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "OVERLORD HYDRA",
+    "image": "https://tr.rbxcdn.com/180DAY-f0a277dc453a8c05f3dfdfa8241ce13d/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Aetherhorn Charger",
+    "image": "https://tr.rbxcdn.com/180DAY-1bee47b6d38a076312a9b484ca2eb42f/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Aquaceratops",
+    "image": "https://tr.rbxcdn.com/180DAY-4b0447ca98f8419b39366a489ec5da8c/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Ashen Seahorse",
+    "image": "https://tr.rbxcdn.com/180DAY-9c7c32c1073e28a870c4af8d393d6fe1/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Boltfin Coelacanth",
+    "image": "https://tr.rbxcdn.com/180DAY-f7e56fd6a7aa4b3488c9fe3f56a154af/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Brimstone Catfish",
+    "image": "https://tr.rbxcdn.com/180DAY-fa577a69183956ef4148d8780e869e82/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Charged Isopod",
+    "image": "https://tr.rbxcdn.com/180DAY-a9588d63315aa5aff9528a86997cea2a/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Cryoclaw Lobster",
+    "image": "https://tr.rbxcdn.com/180DAY-bd5043d9a9502fd764bc1221a28f44e8/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Flarebait Angler",
+    "image": "https://tr.rbxcdn.com/180DAY-adfa1ccc89d314e06401a32894485751/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Frostbound Oracle",
+    "image": "https://tr.rbxcdn.com/180DAY-2a94db880241799c7bc0c5062a18dbe0/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Fulgur Naso",
+    "image": "https://tr.rbxcdn.com/180DAY-88ab4bfad96bf196be978417dac69cb3/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Wintermaw Wolfeel",
+    "image": "https://tr.rbxcdn.com/180DAY-b8f4e3ee6d3ed31d8b39b6391393aee2/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Pyroclast Stonefish",
+    "image": "https://tr.rbxcdn.com/180DAY-fea4f030c1680dc5da103b90f92fcdb2/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Scoria Stone Crab",
+    "image": "https://tr.rbxcdn.com/180DAY-6856509283297169a35d7556a58e1761/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Teslacoil Octopus",
+    "image": "https://tr.rbxcdn.com/180DAY-5f895a29622f74549fd4613172e7ac6d/420/420/Image/Png/noFilter"
+  },
+  {
+    "name": "Thundercrest Ray",
+    "image": "https://tr.rbxcdn.com/180DAY-f6ad0c85b3655d55e652ef1c2c2d534e/420/420/Image/Png/noFilter"
   },
   {
     "name": "Runic Enchant Stone",
